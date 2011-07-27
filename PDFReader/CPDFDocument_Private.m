@@ -16,7 +16,7 @@
 
 - (CPersistentCache *)cache
     {
-    const void *theCacheKey = "cache";
+    void *theCacheKey = "cache";
     CPersistentCache *theCache = objc_getAssociatedObject(self, theCacheKey);
     if (theCache == NULL)
         {
