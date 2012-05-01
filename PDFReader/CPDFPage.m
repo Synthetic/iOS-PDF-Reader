@@ -22,39 +22,36 @@
 
 @implementation CPDFPage
 
-@synthesize document;
-@synthesize pageNumber;
-@synthesize cg;
+@synthesize document = _document;
+@synthesize pageNumber = _pageNumber;
+@synthesize cg = _cg;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
 	{
 	if ((self = [super init]) != NULL)
 		{
-        document = inDocument;
-        pageNumber = inPageNumber;
+        _document = inDocument;
+        _pageNumber = inPageNumber;
 		}
 	return(self);
 	}
 
 - (void)dealloc
     {
-    document = NULL;
-    
-    if (cg != NULL)
+    if (_cg != NULL)
         {
-        CGPDFPageRelease(cg);
-        cg = NULL;
+        CGPDFPageRelease(_cg);
+        _cg = NULL;
         }
-    //
     }
 
 - (CGPDFPageRef)cg
     {
-    if (cg == NULL)
+    if (_cg == NULL)
         {
-        cg = CGPDFPageRetain(CGPDFDocumentGetPage(self.document.cg, self.pageNumber));
+        _cg = CGPDFPageRetain(CGPDFDocumentGetPage(self.document.cg, self.pageNumber));
         }
-    return(cg);
+    return(_cg);
     }
 
 - (UIImage *)image

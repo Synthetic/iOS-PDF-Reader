@@ -17,11 +17,11 @@
 
 @implementation CPreviewBar
 
-@synthesize selectedPreviewIndex;
-@synthesize previewSize;
-@synthesize previewGap;
-@synthesize placeholderImage;
-@synthesize delegate;
+@synthesize selectedPreviewIndex = _selectedPreviewIndex;
+@synthesize previewSize = _previewSize;
+@synthesize previewGap = _previewGap;
+@synthesize placeholderImage = _placeholderImage;
+@synthesize delegate = _delegate;
 
 - (id)initWithCoder:(NSCoder *)inCoder
     {
@@ -29,14 +29,14 @@
         {
 //        self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
 
-        previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
-        previewGap = 4.0;
+        _previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
+        _previewGap = 4.0;
         
-        UIGraphicsBeginImageContextWithOptions(previewSize, YES, 1.0);
+        UIGraphicsBeginImageContextWithOptions(_previewSize, YES, 1.0);
         
         CGContextRef theContext = UIGraphicsGetCurrentContext();
         CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
-        CGContextFillRect(theContext, (CGRect){ .size = previewSize });
+        CGContextFillRect(theContext, (CGRect){ .size = _previewSize });
         
         
         self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -53,14 +53,14 @@
 
 - (void)setSelectedPreviewIndex:(NSUInteger)inSelectedPreviewIndex
     {
-    if (selectedPreviewIndex != inSelectedPreviewIndex)
+    if (_selectedPreviewIndex != inSelectedPreviewIndex)
         {
-        CALayer *theLayer = [self.layer.sublayers objectAtIndex:selectedPreviewIndex];
+        CALayer *theLayer = [self.layer.sublayers objectAtIndex:_selectedPreviewIndex];
         theLayer.borderWidth = 0.0;
 
 
-        selectedPreviewIndex = inSelectedPreviewIndex;
-        theLayer = [self.layer.sublayers objectAtIndex:selectedPreviewIndex];
+        _selectedPreviewIndex = inSelectedPreviewIndex;
+        theLayer = [self.layer.sublayers objectAtIndex:_selectedPreviewIndex];
         theLayer.borderColor = [[UIColor redColor] colorWithAlphaComponent:0.5].CGColor;
         theLayer.borderWidth = 5.0;
         }
@@ -68,9 +68,9 @@
 
 - (void)setDelegate:(id<CPreviewBarDelegate>)inDelegate
     {
-    if (delegate != inDelegate)
+    if (_delegate != inDelegate)
         {
-        delegate = inDelegate;
+        _delegate = inDelegate;
         
         [self setNeedsLayout];
         }

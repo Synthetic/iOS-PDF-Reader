@@ -24,19 +24,19 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 
 @implementation CPDFDocument
 
-@synthesize URL;
-@synthesize cg;
-@synthesize delegate;
+@synthesize URL = _URL;
+@synthesize cg = _cg;
+@synthesize delegate = _delegate;
 
-@synthesize queue;
+@synthesize queue = _queue;
 
 - (id)initWithURL:(NSURL *)inURL;
 	{
 	if ((self = [super init]) != NULL)
 		{
-        URL = inURL;
+        _URL = inURL;
         
-        cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)self.URL);
+        _cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)inURL);
 
         [self startGeneratingThumbnails];
 		}
@@ -45,19 +45,17 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     
 - (void)dealloc
     {
-    if (queue != NULL)
+    if (_queue != NULL)
         {
-        dispatch_release(queue);
-        queue = NULL;
+        dispatch_release(_queue);
+        _queue = NULL;
         }
     
-    
-    if (cg)
+    if (_cg)
         {
-        CGPDFDocumentRelease(cg);
-        cg = NULL;
+        CGPDFDocumentRelease(_cg);
+        _cg = NULL;
         }
-    //
     }
     
 - (NSUInteger)numberOfPages

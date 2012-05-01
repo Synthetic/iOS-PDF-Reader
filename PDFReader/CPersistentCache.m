@@ -24,19 +24,19 @@
 
 @implementation CPersistentCache
 
-@synthesize name;
-@synthesize converterBlock;
-@synthesize reverseConverterBlock;
+@synthesize name = _name;
+@synthesize converterBlock = _converterBlock;
+@synthesize reverseConverterBlock = _reverseConverterBlock;
 
-@synthesize cache;
-@synthesize URL;
+@synthesize cache = _cache;
+@synthesize URL = _URL;
 
 - (id)initWithName:(NSString *)inName
 	{
 	if ((self = [super init]) != NULL)
 		{
-        name = inName;
-        cache = [[NSCache alloc] init];
+        _name = inName;
+        _cache = [[NSCache alloc] init];
 		}
 	return(self);
 	}
@@ -44,7 +44,7 @@
     
 - (NSURL *)URL
     {
-    if (URL == NULL)
+    if (_URL == NULL)
         {
         NSURL *theURL = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
         theURL = [theURL URLByAppendingPathComponent:@"PersistentCache"];
@@ -54,9 +54,9 @@
             {
             [[NSFileManager defaultManager] createDirectoryAtPath:theURL.path withIntermediateDirectories:YES attributes:NULL error:NULL];
             }
-        URL = theURL;
+        _URL = theURL;
         }
-    return(URL);
+    return(_URL);
     }
     
 - (BOOL)containsObjectForKey:(id)key

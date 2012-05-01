@@ -14,7 +14,7 @@
 
 @implementation CPDFPageView
 
-@synthesize page;
+@synthesize page = _page;
 
 //+ (Class)layerClass
 //    {
@@ -43,12 +43,6 @@
     return(self);
     }
 
-- (void)dealloc
-    {
-    page = NULL;
-    
-    }
-
 - (void)removeFromSuperview
     {
     [super removeFromSuperview];
@@ -56,9 +50,9 @@
     
 - (void)setPage:(CPDFPage *)inPage
     {
-    if (page != inPage)
+    if (_page != inPage)
         {
-        page = inPage;
+        _page = inPage;
         
         [self setNeedsDisplay];
         }
@@ -71,7 +65,7 @@
 // this logic, while doing our real drawing work inside of -drawLayer:inContext:
 -(void)drawRect:(CGRect)r
     {
-    if (page == NULL)
+    if (_page == NULL)
         {
         return;
         }

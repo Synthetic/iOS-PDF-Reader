@@ -21,12 +21,12 @@
 
 @implementation CPDFDocumentViewController
 
-@synthesize document;
-@synthesize pagingView;
-@synthesize pagePlaceholderView;
-@synthesize pageControl;
-@synthesize chromeView;
-@synthesize previewBar;
+@synthesize document = _document;
+@synthesize pagingView = _pagingView;
+@synthesize pagePlaceholderView = _pagePlaceholderView;
+@synthesize pageControl = _pageControl;
+@synthesize chromeView = _chromeView;
+@synthesize previewBar = _previewBar;
 
 - (id)init
 	{
@@ -40,16 +40,10 @@
     {
 	if ((self = [self init]) != NULL)
 		{
-        document = [[CPDFDocument alloc] initWithURL:inURL];
-        document.delegate = self;
+        _document = [[CPDFDocument alloc] initWithURL:inURL];
+        _document.delegate = self;
 		}
 	return(self);
-    }
-
-- (void)dealloc
-    {
-    document.delegate = NULL;
-    //
     }
 
 - (void)didReceiveMemoryWarning

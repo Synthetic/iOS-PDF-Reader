@@ -11,22 +11,22 @@
 
 @implementation CPDFPagePlaceholderView
 
-@synthesize page;
+@synthesize page = _page;
 
 - (void)dealloc
     {
-    CGPDFPageRelease(page);
+    CGPDFPageRelease(_page);
     //
     }
 
 - (void)setPage:(CGPDFPageRef)inPage
     {
-    if (page != inPage)
+    if (_page != inPage)
         {
-        page = inPage;
+        _page = inPage;
         
 		// determine the size of the PDF page
-		CGRect pageRect = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
+		CGRect pageRect = CGPDFPageGetBoxRect(_page, kCGPDFMediaBox);
 //		CGFloat pdfScale = self.frame.size.width/pageRect.size.width;
         CGFloat pdfScale = 0.125;
 		pageRect.size = CGSizeMake(pageRect.size.width*pdfScale, pageRect.size.height*pdfScale);
@@ -51,7 +51,7 @@
 		// Scale the context so that the PDF page is rendered 
 		// at the correct size for the zoom level.
 		CGContextScaleCTM(theContext, pdfScale,pdfScale);	
-		CGContextDrawPDFPage(theContext, page);
+		CGContextDrawPDFPage(theContext, _page);
 		CGContextRestoreGState(theContext);
 
 		CGContextSetRGBFillColor(theContext, 0.0,0.0,1.0,1.0);

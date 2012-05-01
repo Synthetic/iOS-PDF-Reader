@@ -18,7 +18,7 @@
 
 @implementation CLibraryViewController
 
-@synthesize URLs;
+@synthesize URLs = _URLs;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {

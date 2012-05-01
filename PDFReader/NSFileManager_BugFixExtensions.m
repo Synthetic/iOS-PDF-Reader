@@ -45,13 +45,7 @@
 
 @implementation CBlockEnumerator
 
-@synthesize block;
-
-- (void)dealloc
-    {
-    block = NULL;
-    //
-    }
+@synthesize block = _block;
 
 - (id)nextObject
     {

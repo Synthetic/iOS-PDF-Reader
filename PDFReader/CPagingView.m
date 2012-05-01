@@ -24,36 +24,28 @@
 
 @implementation CPagingView
 
-@synthesize delegate;
-@synthesize dataSource;
-@synthesize currentPageIndex;
-@synthesize previousView;
-@synthesize currentView;
-@synthesize nextView;
+@synthesize delegate = _delegate;
+@synthesize dataSource = _dataSource;
+@synthesize currentPageIndex = _currentPageIndex;
+@synthesize previousView = _previousView;
+@synthesize currentView = _currentView;
+@synthesize nextView = _nextView;
 
-@synthesize scrollView;
-@synthesize numberOfPages;
+@synthesize scrollView = _scrollView;
+@synthesize numberOfPages = _numberOfPages;
 
 - (id)initWithCoder:(NSCoder *)inDecoder
 	{
 	if ((self = [super initWithCoder:inDecoder]) != NULL)
 		{
-        scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
-        scrollView.delegate = self;
-        scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        _scrollView.delegate = self;
+        _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
-        [self addSubview:scrollView];
+        [self addSubview:_scrollView];
 		}
 	return(self);
 	}
-
-- (void)dealloc
-    {
-    delegate = NULL;
-    dataSource = NULL;
-    scrollView.delegate = NULL;
-    //
-    }
 
 - (void)setFrame:(CGRect)inBounds
     {
@@ -71,9 +63,9 @@
 
 - (void)setDataSource:(id<CPagingViewDataSource>)inDataSource
     {
-    if (dataSource != inDataSource)
+    if (_dataSource != inDataSource)
         {
-        dataSource = inDataSource;
+        _dataSource = inDataSource;
         
         self.numberOfPages = [self.dataSource numberOfPagesInPagingView:self];        
         CGRect theBounds = self.bounds;

@@ -17,7 +17,7 @@
 @synthesize leftView, rightView, topView, bottomView;
 @synthesize target, nextAction, previousAction;
 
-@synthesize viewsHidden;
+@synthesize viewsHidden = _viewsHidden;
 
 - (id)initWithCoder:(NSCoder *)inDecoder
     {
