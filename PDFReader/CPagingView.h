@@ -17,14 +17,14 @@
     
 }
 
-@property (readwrite, nonatomic, assign) id <CPagingViewDelegate> delegate;
-@property (readwrite, nonatomic, assign) id <CPagingViewDataSource> dataSource;
+@property (readwrite, nonatomic, weak) id <CPagingViewDelegate> delegate;
+@property (readwrite, nonatomic, weak) id <CPagingViewDataSource> dataSource;
 
 @property (readonly, nonatomic, assign) NSUInteger currentPageIndex;
 
-@property (readonly, nonatomic, retain) UIView *previousView;
-@property (readonly, nonatomic, retain) UIView *currentView;
-@property (readonly, nonatomic, retain) UIView *nextView;
+@property (readonly, nonatomic, strong) UIView *previousView;
+@property (readonly, nonatomic, strong) UIView *currentView;
+@property (readonly, nonatomic, strong) UIView *nextView;
 
 - (void)scrollToPageAtIndex:(NSUInteger)inIndex animated:(BOOL)inAnimated;
 

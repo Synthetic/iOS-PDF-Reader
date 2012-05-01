@@ -13,8 +13,8 @@
 #define CACHE_VERSION 0
 
 @interface CPersistentCache ()
-@property (readwrite, nonatomic, retain) NSCache *cache;
-@property (readwrite, nonatomic, retain) NSURL *URL;
+@property (readwrite, nonatomic, strong) NSCache *cache;
+@property (readwrite, nonatomic, strong) NSURL *URL;
 
 - (BOOL)object:(id)inObject toData:(NSData **)outData type:(NSString **)outType error:(NSError **)outError;
 - (BOOL)data:(NSData *)inData type:(NSString *)inType toObject:(id *)outObject error:(NSError **)outError;
@@ -35,21 +35,12 @@
 	{
 	if ((self = [super init]) != NULL)
 		{
-        name = [inName retain];
+        name = inName;
         cache = [[NSCache alloc] init];
 		}
 	return(self);
 	}
 
-- (void)dealloc
-    {
-    [name release];
-    
-    [cache release];
-    [URL release];
-    //
-    [super dealloc];
-    }
     
 - (NSURL *)URL
     {
@@ -63,7 +54,7 @@
             {
             [[NSFileManager defaultManager] createDirectoryAtPath:theURL.path withIntermediateDirectories:YES attributes:NULL error:NULL];
             }
-        URL = [theURL retain];
+        URL = theURL;
         }
     return(URL);
     }
@@ -130,7 +121,7 @@
         NSString *theType = NULL;
         if ([self object:obj toData:&theData type:&theType error:NULL] == YES)
             {
-            NSString *theFilenameExtension = [(NSString *)UTTypeCopyPreferredTagWithClass((CFStringRef)theType, kUTTagClassFilenameExtension) autorelease];
+            NSString *theFilenameExtension = (__bridge NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)theType, kUTTagClassFilenameExtension);
             theDataURL = [theURL URLByAppendingPathExtension:theFilenameExtension];
             [theData writeToURL:theDataURL options:0 error:NULL];
             theWriteFlag = YES;

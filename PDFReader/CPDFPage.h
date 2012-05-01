@@ -14,7 +14,7 @@
     
 }
 
-@property (readonly, nonatomic, assign) CPDFDocument *document;
+@property (readonly, nonatomic, weak) CPDFDocument *document;
 @property (readonly, nonatomic, assign) NSInteger pageNumber;
 @property (readonly, nonatomic, assign) CGPDFPageRef cg;
 

@@ -14,6 +14,6 @@
     
 }
 
-@property (readwrite, nonatomic, retain) CPDFPage *page;
+@property (readwrite, nonatomic, strong) CPDFPage *page;
 
 @end

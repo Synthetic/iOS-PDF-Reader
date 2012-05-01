@@ -23,7 +23,7 @@
     
     NSDirectoryEnumerator *theInnerEnumerator = [self enumeratorAtPath:[url path]];
 
-    CBlockEnumerator *theEnumerator = [[[CBlockEnumerator alloc] init] autorelease];
+    CBlockEnumerator *theEnumerator = [[CBlockEnumerator alloc] init];
     theEnumerator.block = ^id(void) {
         NSString *thePath = [theInnerEnumerator nextObject];
         if (thePath != NULL)
@@ -49,10 +49,8 @@
 
 - (void)dealloc
     {
-    [block release];
     block = NULL;
     //
-    [super dealloc];
     }
 
 - (id)nextObject

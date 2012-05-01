@@ -9,16 +9,14 @@
 #import <UIKit/UIKit.h>
 
 
-@interface CPageControl : UIControl {
-    
-}
+@interface CPageControl : UIControl
 
-@property (readwrite, nonatomic, retain) IBOutlet UIView *leftView;
-@property (readwrite, nonatomic, retain) IBOutlet UIView *rightView;
-@property (readwrite, nonatomic, retain) IBOutlet UIView *topView;
-@property (readwrite, nonatomic, retain) IBOutlet UIView *bottomView;
+@property (readwrite, nonatomic, strong) IBOutlet UIView *leftView;
+@property (readwrite, nonatomic, strong) IBOutlet UIView *rightView;
+@property (readwrite, nonatomic, strong) IBOutlet UIView *topView;
+@property (readwrite, nonatomic, strong) IBOutlet UIView *bottomView;
 
-@property (readwrite, nonatomic, assign) id target;
+@property (readwrite, nonatomic, weak) id target;
 @property (readwrite, nonatomic, assign) SEL nextAction;
 @property (readwrite, nonatomic, assign) SEL previousAction;
 

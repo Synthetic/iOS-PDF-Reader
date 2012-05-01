@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PDFReaderAppDelegate : NSObject <UIApplicationDelegate> {
+@interface PDFReaderAppDelegate : NSObject <UIApplicationDelegate>
 
-}
-
-@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, strong) IBOutlet UIWindow *window;
 
 @end

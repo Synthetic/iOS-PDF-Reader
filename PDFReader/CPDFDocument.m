@@ -10,6 +10,7 @@
 
 #import "CPDFDocument_Private.h"
 #import "CPDFPage.h"
+#import "CPersistentCache.h"
 
 static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef value, void *info);
 
@@ -33,9 +34,9 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 	{
 	if ((self = [super init]) != NULL)
 		{
-        URL = [inURL retain];
+        URL = inURL;
         
-        cg = CGPDFDocumentCreateWithURL((CFURLRef)self.URL);
+        cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)self.URL);
 
         [self startGeneratingThumbnails];
 		}
@@ -50,8 +51,6 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
         queue = NULL;
         }
     
-    [URL release];
-    URL = NULL;
     
     if (cg)
         {
@@ -59,7 +58,6 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
         cg = NULL;
         }
     //
-    [super dealloc];
     }
     
 - (NSUInteger)numberOfPages
@@ -76,7 +74,7 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     CGPDFDictionaryGetString(theInfo, "Title", &thePDFTitle);
 //    kCGPDF
     
-    NSString *theTitle = [(NSString *)CGPDFStringCopyTextString(thePDFTitle) autorelease];
+    NSString *theTitle = (__bridge_transfer NSString *)CGPDFStringCopyTextString(thePDFTitle);
     
     return(theTitle);
     }
@@ -89,7 +87,7 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     CPDFPage *thePage = [self.cache objectForKey:theKey];
     if (thePage == NULL)
         {
-        thePage = [[[CPDFPage alloc] initWithDocument:self pageNumber:inPageNumber] autorelease];
+        thePage = [[CPDFPage alloc] initWithDocument:self pageNumber:inPageNumber];
         [self.cache setObject:thePage forKey:theKey];
         }
     return(thePage);
@@ -109,7 +107,7 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
             
             CPDFPage *thePage = [self pageForPageNumber:thePageNumber];
 
-            NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", thePageNumber];
+            NSString *theKey = [NSString stringWithFormat:@"page_%zd_image_128x128", thePageNumber];
             if ([self.cache objectForKey:theKey] == NULL)
                 {
                 UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 }];

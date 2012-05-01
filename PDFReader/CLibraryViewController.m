@@ -29,10 +29,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [super dealloc];
-}
 
 - (void)didReceiveMemoryWarning
 {
@@ -116,12 +112,12 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
     NSURL *theURL = [self.URLs objectAtIndex:indexPath.row];
     
-    CPDFDocument *theDocument = [[[CPDFDocument alloc] initWithURL:theURL] autorelease];
+    CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:theURL];
     NSLog(@"%@", theDocument.title);
     
     
@@ -143,7 +139,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSURL *theURL = [self.URLs objectAtIndex:indexPath.row];
-    CPDFDocumentViewController *theViewController = [[[CPDFDocumentViewController alloc] initWithURL:theURL] autorelease];
+    CPDFDocumentViewController *theViewController = [[CPDFDocumentViewController alloc] initWithURL:theURL];
     [self.navigationController pushViewController:theViewController animated:YES];
 }
 
@@ -203,7 +199,7 @@
     [self.tableView reloadData];
     
     NSURL *theURL = [[inNotification userInfo] objectForKey:@"URL"];
-    CPDFDocumentViewController *theViewController = [[[CPDFDocumentViewController alloc] initWithURL:theURL] autorelease];
+    CPDFDocumentViewController *theViewController = [[CPDFDocumentViewController alloc] initWithURL:theURL];
     if (self.navigationController.topViewController == self)
         {
         [self.navigationController pushViewController:theViewController animated:YES];

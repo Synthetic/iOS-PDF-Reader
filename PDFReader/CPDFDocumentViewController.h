@@ -18,13 +18,13 @@
     
 }
 
-@property (readwrite, nonatomic, retain) CPDFDocument *document;
+@property (readwrite, nonatomic, strong) CPDFDocument *document;
 
-@property (readwrite, nonatomic, retain) IBOutlet CPagingView *pagingView;
-@property (readwrite, nonatomic, retain) IBOutlet CPDFPagePlaceholderView *pagePlaceholderView;
-@property (readwrite, nonatomic, retain) IBOutlet CPageControl *pageControl;
-@property (readwrite, nonatomic, retain) IBOutlet UIView *chromeView;
-@property (readwrite, nonatomic, retain) IBOutlet CPreviewBar *previewBar;
+@property (readwrite, nonatomic, strong) IBOutlet CPagingView *pagingView;
+@property (readwrite, nonatomic, strong) IBOutlet CPDFPagePlaceholderView *pagePlaceholderView;
+@property (readwrite, nonatomic, strong) IBOutlet CPageControl *pageControl;
+@property (readwrite, nonatomic, strong) IBOutlet UIView *chromeView;
+@property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 
 - (id)initWithURL:(NSURL *)inURL;
 

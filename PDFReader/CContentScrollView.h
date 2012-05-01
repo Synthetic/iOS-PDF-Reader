@@ -12,6 +12,6 @@
     
 }
 
-@property (readwrite, nonatomic, retain) IBOutlet UIView *contentView;
+@property (readwrite, nonatomic, strong) IBOutlet UIView *contentView;
 
 @end

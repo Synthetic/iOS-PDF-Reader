@@ -19,8 +19,8 @@
 
 @property (readwrite, nonatomic, assign) CGSize previewSize;
 @property (readwrite, nonatomic, assign) CGFloat previewGap;
-@property (readwrite, nonatomic, retain) UIImage *placeholderImage;
-@property (readwrite, nonatomic, assign) id <CPreviewBarDelegate> delegate;
+@property (readwrite, nonatomic, strong) UIImage *placeholderImage;
+@property (readwrite, nonatomic, weak) id <CPreviewBarDelegate> delegate;
 
 - (void)updatePreviewAtIndex:(NSInteger)inIndex;
 

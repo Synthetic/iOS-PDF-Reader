@@ -13,6 +13,6 @@
     
 }
 
-@property (readwrite, nonatomic, retain) NSArray *URLs;
+@property (readwrite, nonatomic, strong) NSArray *URLs;
 
 @end

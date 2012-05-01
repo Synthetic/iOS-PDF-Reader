@@ -45,17 +45,11 @@
         
         self.opaque = NO;
         
-        [self addGestureRecognizer:[[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)] autorelease]];
+        [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)]];
         }
     return(self);
     }
 
-- (void)dealloc
-    {
-    [placeholderImage release];
-    //
-    [super dealloc];
-    }
 
 - (void)setSelectedPreviewIndex:(NSUInteger)inSelectedPreviewIndex
     {

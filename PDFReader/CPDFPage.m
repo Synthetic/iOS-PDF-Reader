@@ -11,9 +11,10 @@
 #import "CPDFDocument.h"
 #import "CPDFDocument_Private.h"
 #import "Geometry.h"
+#import "CPersistentCache.h"
 
 @interface CPDFPage ()
-@property (readwrite, nonatomic, assign) CPDFDocument *document;
+@property (readwrite, nonatomic, weak) CPDFDocument *document;
 @property (readwrite, nonatomic, assign) NSInteger pageNumber;
 @end
 
@@ -45,7 +46,6 @@
         cg = NULL;
         }
     //
-    [super dealloc];
     }
 
 - (CGPDFPageRef)cg

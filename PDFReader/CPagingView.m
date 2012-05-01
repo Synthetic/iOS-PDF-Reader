@@ -11,11 +11,11 @@
 @interface CPagingView () <UIScrollViewDelegate>
 @property (readwrite, nonatomic, assign) NSUInteger currentPageIndex;
 
-@property (readwrite, nonatomic, retain) UIView *previousView;
-@property (readwrite, nonatomic, retain) UIView *currentView;
-@property (readwrite, nonatomic, retain) UIView *nextView;
+@property (readwrite, nonatomic, strong) UIView *previousView;
+@property (readwrite, nonatomic, strong) UIView *currentView;
+@property (readwrite, nonatomic, strong) UIView *nextView;
 
-@property (readwrite, nonatomic, retain) UIScrollView *scrollView;
+@property (readwrite, nonatomic, strong) UIScrollView *scrollView;
 @property (readwrite, nonatomic, assign) NSUInteger numberOfPages;
 
 - (void)updatePages;
@@ -51,13 +51,8 @@
     {
     delegate = NULL;
     dataSource = NULL;
-    [previousView release];
-    [currentView release];
-    [nextView release];
     scrollView.delegate = NULL;
-    [scrollView release];
     //
-    [super dealloc];
     }
 
 - (void)setFrame:(CGRect)inBounds

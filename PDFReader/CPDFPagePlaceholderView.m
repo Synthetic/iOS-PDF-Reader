@@ -17,7 +17,6 @@
     {
     CGPDFPageRelease(page);
     //
-    [super dealloc];
     }
 
 - (void)setPage:(CGPDFPageRef)inPage

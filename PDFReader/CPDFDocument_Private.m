@@ -21,7 +21,7 @@
     if (theCache == NULL)
         {
         NSString *theCacheName = [[self.URL lastPathComponent] stringByDeletingPathExtension];
-        theCache = [[[CPersistentCache alloc] initWithName:theCacheName] autorelease];
+        theCache = [[CPersistentCache alloc] initWithName:theCacheName];
         objc_setAssociatedObject(self, theCacheKey, theCache, OBJC_ASSOCIATION_RETAIN);
         }
     return(theCache);

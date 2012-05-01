@@ -16,12 +16,12 @@
     
 }
 
-@property (readonly, nonatomic, retain) NSURL *URL;
+@property (readonly, nonatomic, strong) NSURL *URL;
 @property (readonly, nonatomic, assign) CGPDFDocumentRef cg;
 @property (readonly, nonatomic, assign) NSUInteger numberOfPages;
-@property (readwrite, nonatomic, assign) id <CPDFDocumentDelegate> delegate;
+@property (readwrite, nonatomic, weak) id <CPDFDocumentDelegate> delegate;
 
-@property (readonly, nonatomic, retain) NSString *title;
+@property (readonly, nonatomic, strong) NSString *title;
 
 - (id)initWithURL:(NSURL *)inURL;
 

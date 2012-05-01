@@ -45,10 +45,8 @@
 
 - (void)dealloc
     {
-    [page release];
     page = NULL;
     
-    [super dealloc];
     }
 
 - (void)removeFromSuperview
@@ -60,8 +58,7 @@
     {
     if (page != inPage)
         {
-        [page release];
-        page = [inPage retain];
+        page = inPage;
         
         [self setNeedsDisplay];
         }

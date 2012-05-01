@@ -12,11 +12,6 @@
 
 @synthesize window;
 
-- (void)dealloc
-    {
-    [window release];
-    [super dealloc];
-    }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     {

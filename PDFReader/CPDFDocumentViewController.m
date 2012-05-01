@@ -49,14 +49,7 @@
 - (void)dealloc
     {
     document.delegate = NULL;
-    [document release];
-    [pagingView release];
-    [pagePlaceholderView release];
-    [pageControl release];
-    [chromeView release];
-    [previewBar release];
     //
-    [super dealloc];
     }
 
 - (void)didReceiveMemoryWarning
@@ -72,22 +65,22 @@
     
     self.pagingView.dataSource = self;
     
-    UITapGestureRecognizer *theRecognizer = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)] autorelease];
+    UITapGestureRecognizer *theRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
     [self.view addGestureRecognizer:theRecognizer];
 
-    UISwipeGestureRecognizer *theSwipeRecognizer = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)] autorelease];
+    UISwipeGestureRecognizer *theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:theSwipeRecognizer];
     
-    theSwipeRecognizer = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)] autorelease];
+    theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:theSwipeRecognizer];
 
-    theSwipeRecognizer = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)] autorelease];
+    theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionUp;
     [self.view addGestureRecognizer:theSwipeRecognizer];
     
-    theSwipeRecognizer = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)] autorelease];
+    theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:theSwipeRecognizer];
     
@@ -175,8 +168,8 @@
 
 - (UIView *)pagingView:(CPagingView *)inPagingView viewForPageAtIndex:(NSUInteger)inIndex
     {
-    CPDFPageView *thePageView = [[[CPDFPageView alloc] initWithFrame:(CGRect){ .size = { 0, 0 } }] autorelease];
-    thePageView.page = [[[CPDFPage alloc] initWithDocument:self.document pageNumber:inIndex + 1] autorelease];
+    CPDFPageView *thePageView = [[CPDFPageView alloc] initWithFrame:(CGRect){ .size = { 0, 0 } }];
+    thePageView.page = [[CPDFPage alloc] initWithDocument:self.document pageNumber:inIndex + 1];
     return(thePageView);
     }
 
