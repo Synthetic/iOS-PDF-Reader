@@ -41,6 +41,7 @@
 		455699FB155071A5009E52FE /* NSFileManager_BugFixExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699F4155071A5009E52FE /* NSFileManager_BugFixExtensions.m */; };
 		455699FD155071BB009E52FE /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = 455699FC155071BB009E52FE /* Samples */; };
 		455699FE155071D4009E52FE /* PDFReaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699A815507139009E52FE /* PDFReaderTests.m */; };
+		45D9699B1552F8F600338688 /* CPDFAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D9699A1552F8F600338688 /* CPDFAnnotation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +108,8 @@
 		455699F3155071A5009E52FE /* NSFileManager_BugFixExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSFileManager_BugFixExtensions.h; sourceTree = "<group>"; };
 		455699F4155071A5009E52FE /* NSFileManager_BugFixExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSFileManager_BugFixExtensions.m; sourceTree = "<group>"; };
 		455699FC155071BB009E52FE /* Samples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Samples; sourceTree = "<group>"; };
+		45D969991552F8F600338688 /* CPDFAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPDFAnnotation.h; sourceTree = "<group>"; };
+		45D9699A1552F8F600338688 /* CPDFAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPDFAnnotation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +246,8 @@
 				455699C215507141009E52FE /* CPDFDocument_Private.m */,
 				455699C315507141009E52FE /* CPDFPage.h */,
 				455699C415507141009E52FE /* CPDFPage.m */,
+				45D969991552F8F600338688 /* CPDFAnnotation.h */,
+				45D9699A1552F8F600338688 /* CPDFAnnotation.m */,
 			);
 			path = "PDF Model";
 			sourceTree = "<group>";
@@ -428,6 +433,7 @@
 				455699F9155071A5009E52FE /* CPersistentCache.m in Sources */,
 				455699FA155071A5009E52FE /* CPreviewBar.m in Sources */,
 				455699FB155071A5009E52FE /* NSFileManager_BugFixExtensions.m in Sources */,
+				45D9699B1552F8F600338688 /* CPDFAnnotation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,6 +12,7 @@
 #import "CPDFDocument_Private.h"
 #import "Geometry.h"
 #import "CPersistentCache.h"
+#import "CPDFAnnotation.h"
 
 @interface CPDFPage ()
 @property (readwrite, nonatomic, weak) CPDFDocument *document;
@@ -25,6 +26,7 @@
 @synthesize document = _document;
 @synthesize pageNumber = _pageNumber;
 @synthesize cg = _cg;
+@synthesize annotations = _annotations;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
 	{
@@ -118,6 +120,34 @@
     NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
     UIImage *theImage = [self.document.cache objectForKey:theKey];
     return(theImage);
+    }
+
+- (NSArray *)annotations
+    {
+    if (_annotations == NULL)
+        {
+        NSMutableArray *theAnnotations = [NSMutableArray array];
+
+        CGPDFDictionaryRef theDictionary = CGPDFPageGetDictionary(self.cg);
+
+        CGPDFArrayRef thePDFAnnotationsArray = NULL;
+        CGPDFDictionaryGetArray(theDictionary, "Annots", &thePDFAnnotationsArray);
+        size_t theCount = CGPDFArrayGetCount(thePDFAnnotationsArray);
+        for (size_t N = 0; N != theCount; ++N)
+            {
+            CGPDFDictionaryRef theObject;
+            CGPDFArrayGetDictionary(thePDFAnnotationsArray, N, &theObject);
+            CPDFAnnotation *theAnnotation = [[CPDFAnnotation alloc] initWithDictionary:theObject];
+            [theAnnotations addObject:theAnnotation];
+            }
+
+    //    CGPDFDictionaryApplyBlock(theDictionary, ^(const char *key, CGPDFObjectRef value) {
+    //        NSLog(@"%s", key);
+    //        });
+
+        _annotations = [theAnnotations copy];
+        }
+    return(_annotations);
     }
 
 @end

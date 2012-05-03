@@ -117,9 +117,6 @@
     NSURL *theURL = [self.URLs objectAtIndex:indexPath.row];
 
     CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:theURL];
-    NSLog(@"%@", theDocument.title);
-
-
     cell.textLabel.text = theDocument.title;
 
     // Configure the cell...

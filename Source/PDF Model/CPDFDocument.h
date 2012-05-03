@@ -33,3 +33,6 @@
 - (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPage:(CPDFPage *)inPage;
 
 @end
+
+extern id ConvertPDFObject(CGPDFObjectRef inObject);
+extern void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value));

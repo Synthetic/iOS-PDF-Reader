@@ -11,6 +11,7 @@
 #import "CFastTiledLayer.h"
 #import "Geometry.h"
 #import "CPDFPage.h"
+#import "CPDFAnnotation.h"
 
 @implementation CPDFPageView
 
@@ -39,6 +40,11 @@
 
         self.layer.borderColor = [UIColor purpleColor].CGColor;
         self.layer.borderWidth = 2.0;
+
+        UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+        [self addGestureRecognizer:theTapGestureRecognizer];
+
+        self.userInteractionEnabled = YES;
         }
     return(self);
     }
@@ -109,6 +115,11 @@
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
 
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+        {
+        CGContextStrokeRect(theContext, theAnnotation.frame);
+        }
+
 	CGContextRestoreGState(theContext);
     }
 //
@@ -144,5 +155,10 @@
 //
 //    }
 
+
+- (void)tap:(UITapGestureRecognizer *)inTapGestureRecognizer
+    {
+    NSLog(@"TAP");
+    }
 
 @end

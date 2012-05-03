@@ -65,15 +65,10 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 
 - (NSString *)title
     {
-
     CGPDFDictionaryRef theInfo = CGPDFDocumentGetInfo(self.cg);
-
     CGPDFStringRef thePDFTitle = NULL;
     CGPDFDictionaryGetString(theInfo, "Title", &thePDFTitle);
-//    kCGPDF
-
     NSString *theTitle = (__bridge_transfer NSString *)CGPDFStringCopyTextString(thePDFTitle);
-
     return(theTitle);
     }
 
@@ -126,7 +121,118 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 
 @end
 
+id ConvertPDFObject(CGPDFObjectRef inObject)
+    {
+    id theResult = NULL;
+    const CGPDFObjectType theType = CGPDFObjectGetType(inObject);
+    switch (CGPDFObjectGetType(inObject))
+        {
+        case kCGPDFObjectTypeNull:
+            {
+            theResult = [NSNull null];
+            }
+            break;
+        case kCGPDFObjectTypeBoolean:
+            {
+            CGPDFBoolean theValue;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+            theResult = [NSNumber numberWithBool:theValue];
+            }
+            break;
+        case kCGPDFObjectTypeInteger:
+            {
+            CGPDFInteger theValue;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+            theResult = [NSNumber numberWithLong:theValue];
+            }
+            break;
+        case kCGPDFObjectTypeReal:
+            {
+            CGPDFReal theValue;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+            theResult = [NSNumber numberWithDouble:theValue];
+            }
+            break;
+        case kCGPDFObjectTypeName:
+            {
+            const char *theValue;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+            return([NSString stringWithUTF8String:theValue]);
+            }
+            break;
+        case kCGPDFObjectTypeString:
+            {
+            CGPDFStringRef theValue = NULL;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+            theResult = (__bridge_transfer NSString *)CGPDFStringCopyTextString(theValue);
+            }
+            break;
+        case kCGPDFObjectTypeArray:
+            {
+            CGPDFArrayRef theValue = NULL;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+
+            size_t theCount = CGPDFArrayGetCount(theValue);
+            NSMutableArray *theArray = [NSMutableArray array];
+            for (size_t N = 0; N != theCount; ++N)
+                {
+                CGPDFObjectRef thePDFObject;
+                CGPDFArrayGetObject(theValue, N, &thePDFObject);
+                id theObject = ConvertPDFObject(thePDFObject);
+                if (theObject == NULL)
+                    {
+                    NSLog(@"Cannot convert object of type: %d", CGPDFObjectGetType(thePDFObject));
+                    }
+                else
+                    {
+                    [theArray addObject:theObject];
+                    }
+                }
+            theResult = theArray;
+            }
+            break;
+        case kCGPDFObjectTypeDictionary:
+            {
+            CGPDFDictionaryRef theValue = NULL;
+            CGPDFObjectGetValue(inObject, theType, &theValue);
+
+            NSMutableDictionary *theDictionary = [NSMutableDictionary dictionary];
+
+            CGPDFDictionaryApplyBlock(theValue, ^(const char *key, CGPDFObjectRef value) {
+                NSString *theKey = [NSString stringWithUTF8String:key];
+                if ([theKey isEqualToString:@"Parent"])
+                    {
+                    return;
+                    }
+                id theObject = NULL;
+
+                    {
+                    theObject = ConvertPDFObject(value);
+                    }
+                if (theObject == NULL)
+                    {
+                    NSLog(@"Could not process: %@", theKey);
+                    return;
+                    }
+                [theDictionary setObject:theObject forKey:theKey];
+                });
+            theResult = theDictionary;
+            }
+            break;
+        case kCGPDFObjectTypeStream:
+            break;
+        }
+    return(theResult);
+    }
+
+
+void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value))
+    {
+    CGPDFDictionaryApplyFunction(inDictionary, MyCGPDFDictionaryApplierFunction, (__bridge void *)inBlock);
+    }
+
 static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef value, void *info)
     {
-    NSLog(@"%s", key);
+    void (^theBlock)(const char *key, CGPDFObjectRef value) = (__bridge void (^)(const char *, CGPDFObjectRef ))info;
+    theBlock(key, value);
     }
