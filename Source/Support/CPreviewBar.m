@@ -27,7 +27,7 @@
     {
     if ((self = [super initWithCoder:inCoder]) != NULL)
         {
-//        self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
+        self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
 
         _previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
         _previewGap = 4.0;
@@ -38,10 +38,8 @@
         CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
         CGContextFillRect(theContext, (CGRect){ .size = _previewSize });
 
-
         self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
-
 
         self.opaque = NO;
 
@@ -106,7 +104,6 @@
             theLayer.contents = (id)self.placeholderImage.CGImage;
             }
 
-
         [self.layer addSublayer:theLayer];
         }
     }
@@ -114,47 +111,15 @@
 - (void)tap:(UIGestureRecognizer *)inSender
     {
     CGPoint theLocation = [inSender locationInView:self];
-//    theLocation = [self.layer convertPoint:theLocation toLayer:self.layer.superlayer];
     CALayer *theLayer = [self.layer hitTest:theLocation];
     NSUInteger thePreviewIndex = [[theLayer valueForKey:@"previewIndex"] unsignedIntegerValue];
-    NSLog(@"%d", thePreviewIndex);
-
     self.selectedPreviewIndex = thePreviewIndex;
-
     [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
-
-//- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
-//    {
-//    return(NO);
-//    }
-//
-//- (BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
-//    {
-//    return(YES);
-//    }
-//
-//- (void)endTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
-//    {
-//    CGPoint theLocation = [touch locationInView:self];
-//    CALayer *theLayer = [self.layer hitTest:theLocation];
-//    NSUInteger thePreviewIndex = [[theLayer valueForKey:@"previewIndex"] unsignedIntegerValue];
-//    NSLog(@"%d", thePreviewIndex);
-//
-//    self.selectedPreviewIndex = thePreviewIndex;
-//
-//    [self sendActionsForControlEvents:UIControlEventValueChanged];
-//    }
-//
-//- (void)cancelTrackingWithEvent:(UIEvent *)event
-//    {
-//    }
-//
 
 - (void)updatePreviewAtIndex:(NSInteger)inIndex;
     {
     CALayer *theLayer = [self.layer.sublayers objectAtIndex:inIndex];
-
     UIImage *theImage = [self.delegate previewBar:self previewAtIndex:inIndex];
     if (theImage)
         {

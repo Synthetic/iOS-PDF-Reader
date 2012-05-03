@@ -18,46 +18,28 @@
 
 @interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate>
 
-@property (readwrite, nonatomic, strong) CPreviewBar *previewBar;
+@property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
+@property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @end
 
 @implementation CPDFDocumentViewController
 
 @synthesize document = _document;
 
+- (id)initWithDocument:(CPDFDocument *)inDocument
+    {
+    if ((self = [super initWithNibName:NSStringFromClass([self class]) bundle:NULL]) != NULL)
+        {
+        _document = inDocument;
+        _document.delegate = self;
+        }
+    return(self);
+    }
+
 - (id)initWithURL:(NSURL *)inURL;
     {
     CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:inURL];
-    UIPageViewControllerSpineLocation theSpineLocation = UIPageViewControllerSpineLocationMin;
-    if (theDocument.numberOfPages > 1 && UIInterfaceOrientationIsLandscape([UIDevice currentDevice].orientation))
-        {
-        theSpineLocation = UIPageViewControllerSpineLocationMid;
-        }
-    NSDictionary *theOptions = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithInt:theSpineLocation], UIPageViewControllerOptionSpineLocationKey,
-        NULL];
-
-	if ((self = [self initWithTransitionStyle:UIPageViewControllerTransitionStylePageCurl navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:theOptions]) != NULL)
-		{
-        self.dataSource = self;
-        self.delegate = self;
-
-        _document = theDocument;
-        _document.delegate = self;
-
-        NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
-            [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:1]],
-            NULL
-            ];
-        if (self.spineLocation == UIPageViewControllerSpineLocationMid)
-            {
-            [theViewControllers addObject:
-                [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:2]]
-                ];
-            }
-        [self setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
-        }
-	return(self);
+    return([self initWithDocument:theDocument]);
     }
 
 - (void)didReceiveMemoryWarning
@@ -67,42 +49,45 @@
 
 #pragma mark - View lifecycle
 
-- (void)loadView
-    {
-    [super loadView];
-
-    CGRect theBounds = self.view.bounds;
-
-    self.previewBar = [[CPreviewBar alloc] initWithFrame:(CGRect){ .size = { 1024, 64 } }];
-    self.previewBar.delegate = self;
-    [self.previewBar sizeToFit];
-
-    CGRect theFrame = {
-        .origin = {
-            .x = CGRectGetMinY(theBounds),
-            .y = CGRectGetMaxY(theBounds) - 64,
-            },
-        .size = {
-            .width = CGRectGetWidth(theBounds),
-            .height = 64,
-            }
-        };
-
-    CContentScrollView *theScrollView = [[CContentScrollView alloc] initWithFrame:theFrame];
-    theScrollView.contentView = self.previewBar;
-    theScrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-    theScrollView.layer.zPosition = -1;
-    [self.view addSubview:theScrollView];
-
-    UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-//    theTapGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:theTapGestureRecognizer];
-    }
-
 - (void)viewDidLoad
     {
     [super viewDidLoad];
-    //
+
+    self.title = self.document.title;
+
+    self.previewBar.delegate = self;
+    [self.previewBar sizeToFit];
+
+    UIPageViewControllerSpineLocation theSpineLocation = UIPageViewControllerSpineLocationMin;
+    if (_document.numberOfPages > 1 && UIInterfaceOrientationIsLandscape([UIDevice currentDevice].orientation))
+        {
+        theSpineLocation = UIPageViewControllerSpineLocationMid;
+        }
+    NSDictionary *theOptions = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithInt:theSpineLocation], UIPageViewControllerOptionSpineLocationKey,
+        NULL];
+
+    self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStylePageCurl navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:theOptions];
+    self.pageViewController.delegate = self;
+    self.pageViewController.dataSource = self;
+    [self addChildViewController:self.pageViewController];
+    self.pageViewController.view.frame = self.view.bounds;
+    [self.view insertSubview:self.pageViewController.view atIndex:0];
+
+    NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
+        [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:1]],
+        NULL
+        ];
+    if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
+        {
+        [theViewControllers addObject:
+            [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:2]]
+            ];
+        }
+    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
+
+    UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self.view addGestureRecognizer:theTapGestureRecognizer];
     }
 
 - (void)viewDidUnload
@@ -117,7 +102,30 @@
 
 - (void)tap:(UITapGestureRecognizer *)inRecognizer
     {
-    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
+    BOOL theFlag = !self.navigationController.navigationBarHidden;
+
+    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
+        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
+        self.previewBar.alpha = (1.0 - theFlag);
+        } completion:^(BOOL finished) {
+        }];
+    }
+
+- (IBAction)gotoPage:(id)sender
+    {
+    NSUInteger thePageNumber = self.previewBar.selectedPreviewIndex + 1;
+
+    NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
+        [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:thePageNumber]],
+        NULL
+        ];
+    if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
+        {
+        [theViewControllers addObject:
+            [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:thePageNumber + 1]]
+            ];
+        }
+    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
     }
 
 #pragma mark -
@@ -165,31 +173,31 @@
         {
 		theSpineLocation = UIPageViewControllerSpineLocationMin;
 
-		UIViewController *currentViewController = [self.viewControllers objectAtIndex:0];
+		UIViewController *currentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
 		theViewControllers = [NSArray arrayWithObject:currentViewController];
         }
     else
         {
         theSpineLocation = UIPageViewControllerSpineLocationMid;
 
-        CPDFPageViewController *currentViewController = [self.viewControllers objectAtIndex:0];
+        CPDFPageViewController *currentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
 
         NSUInteger indexOfCurrentViewController = currentViewController.page.pageNumber - 1;
         if (indexOfCurrentViewController == 0 || indexOfCurrentViewController % 2 == 0)
             {
-            UIViewController *nextViewController = [self pageViewController:self viewControllerAfterViewController:currentViewController];
+            UIViewController *nextViewController = [self pageViewController:self.pageViewController viewControllerAfterViewController:currentViewController];
             theViewControllers = [NSArray arrayWithObjects:currentViewController, nextViewController, nil];
             }
         else
             {
-            UIViewController *previousViewController = [self pageViewController:self viewControllerBeforeViewController:currentViewController];
+            UIViewController *previousViewController = [self pageViewController:self.pageViewController viewControllerBeforeViewController:currentViewController];
             theViewControllers = [NSArray arrayWithObjects:previousViewController, currentViewController, nil];
             }
         }
 
 //    NSLog(@"%d %@", theSpineLocation, theViewControllers);
 
-    [self setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
+    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
     return(theSpineLocation);
     }
 
@@ -212,16 +220,5 @@
     {
     [self.previewBar updatePreviewAtIndex:inPage.pageNumber - 1];
     }
-
-//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer;
-//    {
-//    NSLog(@"%@", self.gestureRecognizers);
-//
-////    if ([otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]])
-////        {
-////        return(YES);
-////        }
-//    return(NO);
-//    }
 
 @end

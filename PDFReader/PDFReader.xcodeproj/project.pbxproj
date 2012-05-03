@@ -33,7 +33,6 @@
 		455699E515507148009E52FE /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699E415507148009E52FE /* Geometry.m */; };
 		455699F5155071A5009E52FE /* CContentScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699E8155071A5009E52FE /* CContentScrollView.m */; };
 		455699F6155071A5009E52FE /* CFastTiledLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699EA155071A5009E52FE /* CFastTiledLayer.m */; };
-		455699F7155071A5009E52FE /* CPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699EC155071A5009E52FE /* CPageControl.m */; };
 		455699F8155071A5009E52FE /* CPagingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699EE155071A5009E52FE /* CPagingView.m */; };
 		455699F9155071A5009E52FE /* CPersistentCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699F0155071A5009E52FE /* CPersistentCache.m */; };
 		455699FA155071A5009E52FE /* CPreviewBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699F2155071A5009E52FE /* CPreviewBar.m */; };
@@ -44,6 +43,7 @@
 		45D969A01553058E00338688 /* CPDFPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D9699E1553058E00338688 /* CPDFPageViewController.m */; };
 		45D969A11553058E00338688 /* CPDFPageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45D9699F1553058E00338688 /* CPDFPageViewController.xib */; };
 		45D969CD1553177800338688 /* CPDFAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D969CC1553177800338688 /* CPDFAnnotationView.m */; };
+		45D969DA15532A2400338688 /* CPDFDocumentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45D969D915532A2400338688 /* CPDFDocumentViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,8 +98,6 @@
 		455699E8155071A5009E52FE /* CContentScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CContentScrollView.m; sourceTree = "<group>"; };
 		455699E9155071A5009E52FE /* CFastTiledLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CFastTiledLayer.h; sourceTree = "<group>"; };
 		455699EA155071A5009E52FE /* CFastTiledLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CFastTiledLayer.m; sourceTree = "<group>"; };
-		455699EB155071A5009E52FE /* CPageControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPageControl.h; sourceTree = "<group>"; };
-		455699EC155071A5009E52FE /* CPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPageControl.m; sourceTree = "<group>"; };
 		455699ED155071A5009E52FE /* CPagingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPagingView.h; sourceTree = "<group>"; };
 		455699EE155071A5009E52FE /* CPagingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPagingView.m; sourceTree = "<group>"; };
 		455699EF155071A5009E52FE /* CPersistentCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPersistentCache.h; sourceTree = "<group>"; };
@@ -116,6 +114,7 @@
 		45D9699F1553058E00338688 /* CPDFPageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPDFPageViewController.xib; sourceTree = "<group>"; };
 		45D969CB1553177800338688 /* CPDFAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPDFAnnotationView.h; sourceTree = "<group>"; };
 		45D969CC1553177800338688 /* CPDFAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPDFAnnotationView.m; sourceTree = "<group>"; };
+		45D969D915532A2400338688 /* CPDFDocumentViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPDFDocumentViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -263,6 +262,7 @@
 			children = (
 				455699C615507141009E52FE /* CPDFDocumentViewController.h */,
 				455699C715507141009E52FE /* CPDFDocumentViewController.m */,
+				45D969D915532A2400338688 /* CPDFDocumentViewController.xib */,
 				45D9699D1553058E00338688 /* CPDFPageViewController.h */,
 				45D9699E1553058E00338688 /* CPDFPageViewController.m */,
 				45D9699F1553058E00338688 /* CPDFPageViewController.xib */,
@@ -301,8 +301,6 @@
 				455699E8155071A5009E52FE /* CContentScrollView.m */,
 				455699E9155071A5009E52FE /* CFastTiledLayer.h */,
 				455699EA155071A5009E52FE /* CFastTiledLayer.m */,
-				455699EB155071A5009E52FE /* CPageControl.h */,
-				455699EC155071A5009E52FE /* CPageControl.m */,
 				455699ED155071A5009E52FE /* CPagingView.h */,
 				455699EE155071A5009E52FE /* CPagingView.m */,
 				455699EF155071A5009E52FE /* CPersistentCache.h */,
@@ -392,6 +390,7 @@
 				455699D615507141009E52FE /* CLibraryViewController.xib in Resources */,
 				455699FD155071BB009E52FE /* Samples in Resources */,
 				45D969A11553058E00338688 /* CPDFPageViewController.xib in Resources */,
+				45D969DA15532A2400338688 /* CPDFDocumentViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,7 +437,6 @@
 				455699E515507148009E52FE /* Geometry.m in Sources */,
 				455699F5155071A5009E52FE /* CContentScrollView.m in Sources */,
 				455699F6155071A5009E52FE /* CFastTiledLayer.m in Sources */,
-				455699F7155071A5009E52FE /* CPageControl.m in Sources */,
 				455699F8155071A5009E52FE /* CPagingView.m in Sources */,
 				455699F9155071A5009E52FE /* CPersistentCache.m in Sources */,
 				455699FA155071A5009E52FE /* CPreviewBar.m in Sources */,

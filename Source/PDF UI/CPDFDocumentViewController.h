@@ -9,12 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @class CPDFDocument;
-@class CPagingView;
-@class CPDFPagePlaceholderView;
-@class CPreviewBar;
-@class CPageControl;
 
-@interface CPDFDocumentViewController : UIPageViewController
+@interface CPDFDocumentViewController : UIViewController
 
 @property (readwrite, nonatomic, strong) CPDFDocument *document;
 
