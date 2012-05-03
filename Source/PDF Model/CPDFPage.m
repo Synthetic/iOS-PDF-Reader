@@ -49,7 +49,7 @@
 
 - (NSString *)description
     {
-    return([NSString stringWithFormat:@"%@ (%d - %X)", [super description], self.pageNumber, self.cg]);
+    return([NSString stringWithFormat:@"%@ (%d)", [super description], self.pageNumber]);
     }
 
 - (CGPDFPageRef)cg

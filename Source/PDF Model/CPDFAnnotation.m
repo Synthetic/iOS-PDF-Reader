@@ -9,6 +9,7 @@
 #import "CPDFAnnotation.h"
 
 #import "CPDFDocument.h"
+#import "PDFUtilities.h"
 
 @interface CPDFAnnotation ()
 @end

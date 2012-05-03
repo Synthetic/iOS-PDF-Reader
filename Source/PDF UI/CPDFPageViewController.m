@@ -9,6 +9,8 @@
 #import "CPDFPageViewController.h"
 
 #import "CPDFPageView.h"
+#import "CPDFDocument.h"
+#import "CPDFPage.h"
 
 @interface CPDFPageViewController ()
 @property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;

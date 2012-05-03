@@ -20,11 +20,6 @@
 
 @synthesize page = _page;
 
-//+ (Class)layerClass
-//    {
-//    return([CFastTiledLayer class]);
-//    }
-
 - (id)initWithCoder:(NSCoder *)inCoder
     {
     if ((self = [super initWithCoder:inCoder]) != NULL)
@@ -114,7 +109,7 @@
 
 - (BOOL)isAnnotationInteractive:(CPDFAnnotation *)inAnnotation
     {
-    if ([inAnnotation.subtype isEqualToString:@"Link"] && [[inAnnotation.info objectForKey:@"S"] isEqualToString:@"URI"])
+    if ([inAnnotation.subtype isEqualToString:@"Link"])// && [[inAnnotation.info objectForKey:@"S"] isEqualToString:@"URI"])
         {
         return(YES);
         }
