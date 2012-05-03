@@ -28,7 +28,7 @@
 
 - (id)initWithDocument:(CPDFDocument *)inDocument
     {
-    if ((self = [super initWithNibName:NSStringFromClass([self class]) bundle:NULL]) != NULL)
+    if ((self = [super initWithNibName:@"CPDFDocumentViewController" bundle:NULL]) != NULL)
         {
         _document = inDocument;
         _document.delegate = self;
