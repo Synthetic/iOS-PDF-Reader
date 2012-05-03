@@ -30,6 +30,7 @@
 
 @protocol CPDFDocumentDelegate <NSObject>
 
+@optional
 - (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPage:(CPDFPage *)inPage;
 
 @end

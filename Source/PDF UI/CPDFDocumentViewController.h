@@ -14,15 +14,9 @@
 @class CPreviewBar;
 @class CPageControl;
 
-@interface CPDFDocumentViewController : UIViewController
+@interface CPDFDocumentViewController : UIPageViewController
 
 @property (readwrite, nonatomic, strong) CPDFDocument *document;
-
-@property (readwrite, nonatomic, strong) IBOutlet CPagingView *pagingView;
-@property (readwrite, nonatomic, strong) IBOutlet CPDFPagePlaceholderView *pagePlaceholderView;
-@property (readwrite, nonatomic, strong) IBOutlet CPageControl *pageControl;
-@property (readwrite, nonatomic, strong) IBOutlet UIView *chromeView;
-@property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 
 - (id)initWithURL:(NSURL *)inURL;
 

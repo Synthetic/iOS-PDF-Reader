@@ -108,7 +108,10 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
                 }
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self.delegate PDFDocument:self didUpdateThumbnailForPage:thePage];
+                if ([self.delegate respondsToSelector:@selector(PDFDocument:didUpdateThumbnailForPage:)])
+                    {
+                    [self.delegate PDFDocument:self didUpdateThumbnailForPage:thePage];
+                    }
                 });
             });
         });

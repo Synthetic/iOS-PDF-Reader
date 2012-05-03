@@ -13,6 +13,9 @@
 #import "CPDFPage.h"
 #import "CPDFAnnotation.h"
 
+@interface CPDFPageView () <UIGestureRecognizerDelegate>
+@end
+
 @implementation CPDFPageView
 
 @synthesize page = _page;
@@ -28,20 +31,11 @@
         {
         self.contentMode = UIViewContentModeRedraw;
 
-//		CATiledLayer *tiledLayer = (CATiledLayer *)[self layer];
-//		// levelsOfDetail and levelsOfDetailBias determine how
-//		// the layer is rendered at different zoom levels.  This
-//		// only matters while the view is zooming, since once the
-//		// the view is done zooming a new TiledPDFView is created
-//		// at the correct size and scale.
-//        tiledLayer.levelsOfDetail = 4;
-//		tiledLayer.levelsOfDetailBias = 4;
-//		tiledLayer.tileSize = CGSizeMake(2048, 2048);
-
-        self.layer.borderColor = [UIColor purpleColor].CGColor;
-        self.layer.borderWidth = 2.0;
+//        self.layer.borderColor = [UIColor purpleColor].CGColor;
+//        self.layer.borderWidth = 2.0;
 
         UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+        theTapGestureRecognizer.delegate = self;
         [self addGestureRecognizer:theTapGestureRecognizer];
 
         self.userInteractionEnabled = YES;
@@ -64,11 +58,6 @@
         }
     }
 
-// UIView uses the existence of -drawRect: to determine if it should allow its CALayer
-// to be invalidated, which would then lead to the layer creating a backing store and
-// -drawLayer:inContext: being called.
-// By implementing an empty -drawRect: method, we allow UIKit to continue to implement
-// this logic, while doing our real drawing work inside of -drawLayer:inContext:
 -(void)drawRect:(CGRect)r
     {
     if (_page == NULL)
@@ -115,50 +104,84 @@
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
 
-    for (CPDFAnnotation *theAnnotation in self.page.annotations)
-        {
-        CGContextStrokeRect(theContext, theAnnotation.frame);
-        }
+//    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+//        {
+//        CGContextStrokeRect(theContext, theAnnotation.frame);
+//        }
 
 	CGContextRestoreGState(theContext);
     }
-//
-//
-//// Draw the CGPDFPageRef into the layer at the correct scale.
-//-(void)drawLayer:(CALayer*)layer inContext:(CGContextRef)context
-//    {
-//    CGRect pageRect = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
-//    CGFloat myScale = self.frame.size.width / pageRect.size.width;
-//
-//	// First fill the background with white.
-//	CGContextSetRGBFillColor(context, 1.0,1.0,1.0,1.0);
-//    CGContextFillRect(context, self.bounds);
-//
-//	CGContextSaveGState(context);
-//	// Flip the context so that the PDF page is rendered
-//	// right side up.
-//	CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
-//	CGContextScaleCTM(context, 1.0, -1.0);
-//
-//	// Scale the context so that the PDF page is rendered
-//	// at the correct size for the zoom level.
-//	CGContextScaleCTM(context, myScale,myScale);
-//	CGContextDrawPDFPage(context, self.page);
-//
-//	CGContextRestoreGState(context);
-//
-//	CGContextSetRGBFillColor(context, 1.0,0.0,0.0,1.0);
-//    CGContextStrokeRect(context, self.bounds);
-//
-//
-//
-//
-//    }
 
-
-- (void)tap:(UITapGestureRecognizer *)inTapGestureRecognizer
+- (BOOL)isAnnotationInteractive:(CPDFAnnotation *)inAnnotation
     {
-    NSLog(@"TAP");
+    if ([inAnnotation.subtype isEqualToString:@"Link"] && [[inAnnotation.info objectForKey:@"S"] isEqualToString:@"URI"])
+        {
+        return(YES);
+        }
+    else
+        {
+        return(NO);
+        }
+    }
+
+- (void)tap:(UITapGestureRecognizer *)inGestureRecognizer
+    {
+    CGPoint theLocation = [inGestureRecognizer locationInView:self];
+    CPDFAnnotation *theAnnotation = [self annotationForPoint:theLocation];
+    if (theAnnotation != NULL && [self isAnnotationInteractive:theAnnotation])
+        {
+        NSLog(@"Annotation tapped: %@", theAnnotation);
+
+        NSString *theURLString = [theAnnotation.info objectForKey:@"URI"];
+        if (theURLString.length > 0)
+            {
+            NSURL *theURL = [NSURL URLWithString:theURLString];
+            if ([[UIApplication sharedApplication] canOpenURL:theURL])
+                {
+                [[UIApplication sharedApplication] openURL:theURL];
+                }
+            }
+        }
+
+    }
+
+- (CPDFAnnotation *)annotationForPoint:(CGPoint)inPoint
+    {
+    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
+    const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+    CGAffineTransform theTransform = CGAffineTransformMakeTranslation(0, self.bounds.size.height);
+    theTransform = CGAffineTransformScale(theTransform, 1.0, -1.0);
+    theTransform = CGAffineTransformTranslate(theTransform, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
+    theTransform = CGAffineTransformScale(theTransform, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
+
+    theTransform = CGAffineTransformInvert(theTransform);
+
+    inPoint = CGPointApplyAffineTransform(inPoint, theTransform);
+
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+        {
+        if (CGRectContainsPoint(theAnnotation.frame, inPoint))
+            {
+            return(theAnnotation);
+            }
+        }
+
+    return(NULL);
+    }
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer;
+    {
+//    NSLog(@"%@ %@", gestureRecognizer, otherGestureRecognizer);
+    if ([otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]])
+        {
+        CGPoint theLocation = [gestureRecognizer locationInView:self];
+        CPDFAnnotation *theAnnotation =[self annotationForPoint:theLocation];
+        if (theAnnotation != NULL && [self isAnnotationInteractive:theAnnotation])
+            {
+            return(NO);
+            }
+        }
+    return(YES);
     }
 
 @end

@@ -30,21 +30,20 @@
         }
     }
 
-//- (void)setContentView:(UIView *)inContentView
-//    {
-//    if (contentView != inContentView)
-//        {
-//        NSLog(@"SET CONTENT VIEW");
-//        
-//        [contentView release];
-//        contentView = [inContentView retain];
-//        
+- (void)setContentView:(UIView *)inContentView
+    {
+    if (contentView != inContentView)
+        {
+        NSLog(@"SET CONTENT VIEW");
+        
+        contentView = inContentView;
+        
 //        [contentView addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:0];
-//        
-//        self.contentSize = self.contentView.frame.size;
-//        }
-//    }
-//
+
+        self.contentSize = self.contentView.frame.size;
+        }
+    }
+
 //- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
 //    {
 //    NSLog(@"CHANGE: %@", change);

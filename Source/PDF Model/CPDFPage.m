@@ -47,6 +47,11 @@
         }
     }
 
+- (NSString *)description
+    {
+    return([NSString stringWithFormat:@"%@ (%d - %X)", [super description], self.pageNumber, self.cg]);
+    }
+
 - (CGPDFPageRef)cg
     {
     if (_cg == NULL)
