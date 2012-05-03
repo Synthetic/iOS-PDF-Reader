@@ -12,7 +12,6 @@
 
 @synthesize window = _window;
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     {
     [self.window makeKeyAndVisible];
@@ -25,9 +24,9 @@
     if ([url isFileURL])
         {
         NSString *theDocumentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-        
+
         NSURL *theDestinationURL = [[NSURL fileURLWithPath:theDocumentsPath] URLByAppendingPathComponent:[url lastPathComponent]];
-        
+
         NSError *theError = NULL;
         BOOL theResult = [[NSFileManager defaultManager] moveItemAtURL:url toURL:theDestinationURL error:&theError];
         if (theResult == YES)
@@ -47,7 +46,7 @@
                 }
             [[NSNotificationCenter defaultCenter] postNotificationName:@"applicationDidOpenURL" object:application userInfo:theUserInfo];
             }
-        
+
         return(theResult);
         }
     return(NO);

@@ -8,14 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface CPersistentCache : NSObject {
-    
-}
+@interface CPersistentCache : NSObject
 
 @property (readonly, nonatomic, strong) NSString *name;
-@property (readonly, nonatomic, copy) BOOL (^converterBlock)(id inObject, NSData **outData, NSString **outType, NSError **outError); 
-@property (readonly, nonatomic, copy) BOOL (^reverseConverterBlock)(NSData *inData, NSString *inType, id *outObject, NSError **outError); 
+@property (readonly, nonatomic, copy) BOOL (^converterBlock)(id inObject, NSData **outData, NSString **outType, NSError **outError);
+@property (readonly, nonatomic, copy) BOOL (^reverseConverterBlock)(NSData *inData, NSString *inType, id *outObject, NSError **outError);
 
 - (id)initWithName:(NSString *)inName;
 

@@ -10,9 +10,7 @@
 
 @class CPDFDocument;
 
-@interface CPDFPage : NSObject {
-    
-}
+@interface CPDFPage : NSObject
 
 @property (readonly, nonatomic, weak) CPDFDocument *document;
 @property (readonly, nonatomic, assign) NSInteger pageNumber;

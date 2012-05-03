@@ -14,9 +14,7 @@
 @class CPreviewBar;
 @class CPageControl;
 
-@interface CPDFDocumentViewController : UIViewController {
-    
-}
+@interface CPDFDocumentViewController : UIViewController
 
 @property (readwrite, nonatomic, strong) CPDFDocument *document;
 

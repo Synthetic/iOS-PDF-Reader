@@ -8,7 +8,6 @@
 
 #import "CFastTiledLayer.h"
 
-
 @implementation CFastTiledLayer
 
 + (CFTimeInterval)fadeDuration

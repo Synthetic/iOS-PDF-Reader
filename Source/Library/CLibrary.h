@@ -8,9 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface CLibrary : NSObject {
-    
-}
+@interface CLibrary : NSObject
 
 @end

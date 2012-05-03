@@ -14,8 +14,8 @@
 
 @implementation CPageControl
 
-@synthesize leftView, rightView, topView, bottomView;
-@synthesize target, nextAction, previousAction;
+@synthesize leftView = _leftView, rightView = _rightView, topView = _topView, bottomView = _bottomView;
+@synthesize target = _target, nextAction = _nextAction, previousAction = _previousAction;
 
 @synthesize viewsHidden = _viewsHidden;
 
@@ -27,15 +27,14 @@
     return(self);
     }
 
-
 - (void)awakeFromNib
     {
     CGFloat W = 128;
     CGFloat H = 128;
     CGFloat theAlpha = 0.05;
-    
+
     const CGSize theBoundsSize = self.bounds.size;
-    
+
     self.leftView = [[UIView alloc] initWithFrame:(CGRect){ .origin = { 0, H }, .size = { W, theBoundsSize.height - H * 2 } }];
     self.leftView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin;
     self.leftView.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:theAlpha];

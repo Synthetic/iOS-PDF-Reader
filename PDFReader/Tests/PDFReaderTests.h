@@ -8,10 +8,9 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-
 @interface PDFReaderTests : SenTestCase {
 @private
-    
+
 }
 
 @end

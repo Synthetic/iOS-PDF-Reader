@@ -285,7 +285,6 @@ const CGPoint r = { .x = a.x * b.x, .y = a.y * b.y };
 return(r);
 }
 
-
 #pragma mark -
 
 struct CIntegerPoint {
@@ -314,7 +313,6 @@ return(thePoint);
 
 extern NSString *NSStringFromCIntegerPoint(CIntegerPoint inPoint);
 extern CIntegerPoint CIntegerPointFromString(NSString *inString);
-
 
 #if !defined(TARGET_OS_IPHONE) || !TARGET_OS_IPHONE
 extern NSString *NSStringFromCGAffineTransform(CGAffineTransform t);

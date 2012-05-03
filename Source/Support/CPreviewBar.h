@@ -10,12 +10,9 @@
 
 @protocol CPreviewBarDelegate;
 
-@interface CPreviewBar : UIControl {
-    
-}
+@interface CPreviewBar : UIControl
 
 @property (readwrite, nonatomic, assign) NSUInteger selectedPreviewIndex;
-
 
 @property (readwrite, nonatomic, assign) CGSize previewSize;
 @property (readwrite, nonatomic, assign) CGFloat previewGap;

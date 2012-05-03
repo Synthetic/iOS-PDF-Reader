@@ -11,7 +11,6 @@
 #import "CPDFDocument.h"
 #import "CPagingView.h"
 #import "CPDFPageView.h"
-#import "CPDFPagePlaceholderView.h"
 #import "CPreviewBar.h"
 #import "CPageControl.h"
 #import "CPDFPage.h"
@@ -54,18 +53,18 @@
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
-    {    
+    {
     [super viewDidLoad];
-    
+
     self.pagingView.dataSource = self;
-    
+
     UITapGestureRecognizer *theRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
     [self.view addGestureRecognizer:theRecognizer];
 
     UISwipeGestureRecognizer *theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:theSwipeRecognizer];
-    
+
     theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:theSwipeRecognizer];
@@ -73,15 +72,15 @@
     theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionUp;
     [self.view addGestureRecognizer:theSwipeRecognizer];
-    
+
     theSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
     theSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:theSwipeRecognizer];
-    
+
     self.previewBar.delegate = self;
     [self.previewBar addTarget:self action:@selector(previewSelected:) forControlEvents:UIControlEventValueChanged];
     [self.previewBar sizeToFit];
-    
+
     self.pageControl.target = self;
     self.pageControl.nextAction = @selector(nextPage:);
     self.pageControl.previousAction = @selector(previousPage:);
@@ -103,12 +102,12 @@
         self.chromeView.alpha = 1.0 - self.chromeView.alpha;
     } completion:NULL];
 
-    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES]; 
-    
-    
+    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
+
+
 //    [[UIApplication sharedApplication] setStatusBarHidden:![UIApplication sharedApplication].statusBarHidden withAnimation:YES];
     }
-    
+
 
 - (IBAction)swipe:(UISwipeGestureRecognizer *)inSender
     {
@@ -129,20 +128,20 @@
     {
     return(self.document.numberOfPages);
     }
-    
+
 - (UIImage *)previewBar:(CPreviewBar *)inPreviewBar previewAtIndex:(NSInteger)inIndex;
     {
     UIImage *theImage = [self.document pageForPageNumber:inIndex + 1].thumbnail;
     return(theImage);
     }
-    
+
 #pragma mark -
 
 - (void)nextPage:(id)inSender
     {
     [self.pagingView scrollToNextPageAnimated:YES];
     }
-    
+
 - (void)previousPage:(id)inSender
     {
     [self.pagingView scrollToPreviousPageAnimated:YES];
@@ -171,6 +170,5 @@
     {
     [self.previewBar updatePreviewAtIndex:inPage.pageNumber - 1];
     }
-
 
 @end

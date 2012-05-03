@@ -35,14 +35,14 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 	if ((self = [super init]) != NULL)
 		{
         _URL = inURL;
-        
+
         _cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)inURL);
 
         [self startGeneratingThumbnails];
 		}
 	return(self);
 	}
-    
+
 - (void)dealloc
     {
     if (_queue != NULL)
@@ -50,14 +50,14 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
         dispatch_release(_queue);
         _queue = NULL;
         }
-    
+
     if (_cg)
         {
         CGPDFDocumentRelease(_cg);
         _cg = NULL;
         }
     }
-    
+
 - (NSUInteger)numberOfPages
     {
     return(CGPDFDocumentGetNumberOfPages(self.cg));
@@ -65,15 +65,15 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 
 - (NSString *)title
     {
-    
+
     CGPDFDictionaryRef theInfo = CGPDFDocumentGetInfo(self.cg);
 
     CGPDFStringRef thePDFTitle = NULL;
     CGPDFDictionaryGetString(theInfo, "Title", &thePDFTitle);
 //    kCGPDF
-    
+
     NSString *theTitle = (__bridge_transfer NSString *)CGPDFStringCopyTextString(thePDFTitle);
-    
+
     return(theTitle);
     }
 
@@ -96,13 +96,13 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     const size_t theNumberOfPages = CGPDFDocumentGetNumberOfPages(self.cg);
 
     self.queue = dispatch_queue_create("com.example.MyQueue", NULL);
-    
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^(void) {
 
         dispatch_apply(theNumberOfPages, self.queue, ^(size_t inIndex) {
 
             const size_t thePageNumber = inIndex + 1;
-            
+
             CPDFPage *thePage = [self pageForPageNumber:thePageNumber];
 
             NSString *theKey = [NSString stringWithFormat:@"page_%zd_image_128x128", thePageNumber];
@@ -122,7 +122,6 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
 - (void)stopGeneratingThumbnails
     {
     }
-
 
 
 @end

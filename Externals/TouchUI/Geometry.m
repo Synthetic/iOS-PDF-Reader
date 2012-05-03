@@ -150,7 +150,6 @@ if (theResult == NO)
 return(thePoint);
 }
 
-
 #if !defined(TARGET_OS_IPHONE) || !TARGET_OS_IPHONE
 NSString *NSStringFromCGAffineTransform(CGAffineTransform t)
 {

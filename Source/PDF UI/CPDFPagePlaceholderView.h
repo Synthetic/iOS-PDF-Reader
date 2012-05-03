@@ -8,10 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface CPDFPagePlaceholderView : UIImageView {
-    
-}
+@interface CPDFPagePlaceholderView : UIImageView
 
 @property (readwrite, nonatomic, assign) CGPDFPageRef page;
 

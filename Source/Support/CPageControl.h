@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface CPageControl : UIControl
 
 @property (readwrite, nonatomic, strong) IBOutlet UIView *leftView;

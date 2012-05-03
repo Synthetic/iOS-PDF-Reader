@@ -14,5 +14,4 @@
 
 @property (readonly, nonatomic, retain) CPersistentCache *cache;
 
-
 @end

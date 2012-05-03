@@ -8,9 +8,6 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-
-@interface CFastTiledLayer : CATiledLayer {
-    
-}
+@interface CFastTiledLayer : CATiledLayer
 
 @end

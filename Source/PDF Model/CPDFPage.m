@@ -60,11 +60,11 @@
     if (theImage == NULL)
         {
         CGRect theMediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
-        
+
         UIGraphicsBeginImageContext(theMediaBox.size);
-        
+
         CGContextRef theContext = UIGraphicsGetCurrentContext();
-        
+
         CGContextSaveGState(theContext);
 
         // Flip the context so that the PDF page is rendered right side up.
@@ -72,15 +72,15 @@
         CGContextDrawPDFPage(theContext, self.cg);
 
         theImage = UIGraphicsGetImageFromCurrentImageContext();
-        
+
         UIGraphicsEndImageContext();
-        
+
         [self.document.cache setObject:theImage forKey:@"image" cost:(NSUInteger)ceil(theImage.size.width * theImage.size.height)];
         }
-    
+
     return(theImage);
     }
-    
+
 - (UIImage *)imageWithSize:(CGSize)inSize
     {
     UIGraphicsBeginImageContext(inSize);
@@ -91,7 +91,7 @@
 
 	// First fill the background with white.
 	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-    
+
 
     const CGRect theMediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
     const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, (CGRect){ .size = inSize }, ImageScaling_Proportionally, ImageAlignment_Center);
@@ -99,18 +99,17 @@
 	// Flip the context so that the PDF page is rendered right side up.
 	CGContextTranslateCTM(theContext, 0.0, inSize.height);
 	CGContextScaleCTM(theContext, 1.0, -1.0);
-	
+
 	// Scale the context so that the PDF page is rendered at the correct size for the zoom level.
     CGContextTranslateCTM(theContext, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
-	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);	
-
+	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
 
 	CGContextDrawPDFPage(theContext, self.cg);
-    
+
     UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
-    
+
     UIGraphicsEndImageContext();
-    
+
     return(theImage);
     }
 

@@ -8,10 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface CLibraryViewController : UITableViewController {
-    
-}
+@interface CLibraryViewController : UITableViewController
 
 @property (readwrite, nonatomic, strong) NSArray *URLs;
 

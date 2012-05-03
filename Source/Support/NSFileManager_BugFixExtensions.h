@@ -8,10 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface NSFileManager (NSFileManager_BugFixExtensions)
 
 - (NSEnumerator *)tx_enumeratorAtURL:(NSURL *)url includingPropertiesForKeys:(NSArray *)keys options:(NSDirectoryEnumerationOptions)mask errorHandler:(BOOL (^)(NSURL *url, NSError *error))handler;
-
 
 @end

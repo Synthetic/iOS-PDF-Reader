@@ -13,9 +13,7 @@
 @protocol CPagingViewDelegate;
 @protocol CPagingViewDataSource;
 
-@interface CPagingView : UIView {
-    
-}
+@interface CPagingView : UIView
 
 @property (readwrite, nonatomic, weak) id <CPagingViewDelegate> delegate;
 @property (readwrite, nonatomic, weak) id <CPagingViewDataSource> dataSource;

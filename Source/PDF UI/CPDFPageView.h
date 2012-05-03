@@ -10,9 +10,7 @@
 
 @class CPDFPage;
 
-@interface CPDFPageView : UIView {
-    
-}
+@interface CPDFPageView : UIView
 
 @property (readwrite, nonatomic, strong) CPDFPage *page;
 

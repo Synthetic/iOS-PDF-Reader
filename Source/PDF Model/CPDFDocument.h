@@ -12,9 +12,7 @@
 
 @class CPDFPage;
 
-@interface CPDFDocument : NSObject {
-    
-}
+@interface CPDFDocument : NSObject
 
 @property (readonly, nonatomic, strong) NSURL *URL;
 @property (readonly, nonatomic, assign) CGPDFDocumentRef cg;

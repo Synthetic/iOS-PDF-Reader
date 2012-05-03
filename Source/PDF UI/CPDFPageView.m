@@ -26,17 +26,17 @@
     if ((self = [super initWithCoder:inCoder]) != NULL)
         {
         self.contentMode = UIViewContentModeRedraw;
-        
+
 //		CATiledLayer *tiledLayer = (CATiledLayer *)[self layer];
 //		// levelsOfDetail and levelsOfDetailBias determine how
 //		// the layer is rendered at different zoom levels.  This
-//		// only matters while the view is zooming, since once the 
+//		// only matters while the view is zooming, since once the
 //		// the view is done zooming a new TiledPDFView is created
 //		// at the correct size and scale.
 //        tiledLayer.levelsOfDetail = 4;
 //		tiledLayer.levelsOfDetailBias = 4;
 //		tiledLayer.tileSize = CGSizeMake(2048, 2048);
-        
+
         self.layer.borderColor = [UIColor purpleColor].CGColor;
         self.layer.borderWidth = 2.0;
         }
@@ -47,13 +47,13 @@
     {
     [super removeFromSuperview];
     }
-    
+
 - (void)setPage:(CPDFPage *)inPage
     {
     if (_page != inPage)
         {
         _page = inPage;
-        
+
         [self setNeedsDisplay];
         }
     }
@@ -69,17 +69,16 @@
         {
         return;
         }
-    
+
     CGContextRef theContext = UIGraphicsGetCurrentContext();
 
 	CGContextSaveGState(theContext);
 
 	// First fill the background with white.
 	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-    
-    CGContextSetFillColorWithColor(theContext, [[UIColor whiteColor] colorWithAlphaComponent:0.9].CGColor);    
-    CGContextFillRect(theContext, self.bounds);
 
+    CGContextSetFillColorWithColor(theContext, [[UIColor whiteColor] colorWithAlphaComponent:0.9].CGColor);
+    CGContextFillRect(theContext, self.bounds);
 
     const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
 
@@ -88,17 +87,15 @@
 	// Flip the context so that the PDF page is rendered right side up.
 	CGContextTranslateCTM(theContext, 0.0, self.bounds.size.height);
 	CGContextScaleCTM(theContext, 1.0, -1.0);
-	
+
 	// Scale the context so that the PDF page is rendered at the correct size for the zoom level.
     CGContextTranslateCTM(theContext, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
-	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);	
+	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
 
-
-    CGContextSetFillColorWithColor(theContext, [UIColor whiteColor].CGColor);    
+    CGContextSetFillColorWithColor(theContext, [UIColor whiteColor].CGColor);
     CGContextFillRect(theContext, theMediaBox);
 
 	CGContextDrawPDFPage(theContext, self.page.cg);
-
 
 	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
     CGContextSetLineWidth(theContext, 0.5);
@@ -111,7 +108,6 @@
 	CGContextSetRGBStrokeColor(theContext, 0.0,0.0,0.0,1.0);
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
-
 
 	CGContextRestoreGState(theContext);
     }
@@ -132,21 +128,21 @@
 //	// right side up.
 //	CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
 //	CGContextScaleCTM(context, 1.0, -1.0);
-//	
-//	// Scale the context so that the PDF page is rendered 
+//
+//	// Scale the context so that the PDF page is rendered
 //	// at the correct size for the zoom level.
-//	CGContextScaleCTM(context, myScale,myScale);	
+//	CGContextScaleCTM(context, myScale,myScale);
 //	CGContextDrawPDFPage(context, self.page);
 //
 //	CGContextRestoreGState(context);
 //
 //	CGContextSetRGBFillColor(context, 1.0,0.0,0.0,1.0);
 //    CGContextStrokeRect(context, self.bounds);
-//	
+//
 //
 //
 //
 //    }
-    
+
 
 @end

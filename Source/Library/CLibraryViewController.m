@@ -29,12 +29,11 @@
     return self;
 }
 
-
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    
+
     // Release any cached data, images, etc that aren't in use.
 }
 
@@ -46,7 +45,7 @@
 
         self.title = @"Library";
 
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidOpenURL:) name:@"applicationDidOpenURL" object:NULL];
 
     [self scanDirectories];
@@ -54,7 +53,7 @@
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
- 
+
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     }
@@ -109,25 +108,24 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
-    
+
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
-    
+
     NSURL *theURL = [self.URLs objectAtIndex:indexPath.row];
-    
+
     CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:theURL];
     NSLog(@"%@", theDocument.title);
-    
-    
+
+
     cell.textLabel.text = theDocument.title;
-    
+
     // Configure the cell...
-    
+
     return cell;
 }
-
 
 #pragma mark - Table view delegate
 
@@ -147,14 +145,14 @@
     {
     NSFileManager *theFileManager = [NSFileManager defaultManager];
 
-    
+
     NSURL *theDocumentsURL = [[theFileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-    
+
     NSURL *theInboxURL = [theDocumentsURL URLByAppendingPathComponent:@"Inbox"];
     NSError *theError = NULL;
     NSEnumerator *theEnumerator = NULL;
     id theErrorHandler = ^(NSURL *url, NSError *error) { NSLog(@"ERROR: %@", error); return(YES); };
-    
+
     if ([theFileManager fileExistsAtPath:theInboxURL.path])
         {
         for (NSURL *theURL in [theFileManager tx_enumeratorAtURL:theInboxURL includingPropertiesForKeys:NULL options:0 errorHandler:theErrorHandler])
@@ -173,14 +171,14 @@
     theEnumerator = [theFileManager tx_enumeratorAtURL:theBundleURL includingPropertiesForKeys:NULL options:0 errorHandler:theErrorHandler];
     theURLs = [theEnumerator allObjects];
     theAllURLs = [theAllURLs arrayByAddingObjectsFromArray:theURLs];
-    
+
     theEnumerator = [theFileManager tx_enumeratorAtURL:theDocumentsURL includingPropertiesForKeys:NULL options:0 errorHandler:theErrorHandler];
     theURLs = [theEnumerator allObjects];
     theAllURLs = [theAllURLs arrayByAddingObjectsFromArray:theURLs];
-    
-    
+
+
     theAllURLs = [theAllURLs filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"lastPathComponent LIKE '*.pdf'"]];
-    
+
     theAllURLs = [theAllURLs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
 //        return(YES);
         return ([[NSFileManager defaultManager] fileExistsAtPath:[evaluatedObject path]]);
@@ -197,7 +195,7 @@
     {
     [self scanDirectories];
     [self.tableView reloadData];
-    
+
     NSURL *theURL = [[inNotification userInfo] objectForKey:@"URL"];
     CPDFDocumentViewController *theViewController = [[CPDFDocumentViewController alloc] initWithURL:theURL];
     if (self.navigationController.topViewController == self)

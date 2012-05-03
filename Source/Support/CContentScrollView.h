@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CContentScrollView : UIScrollView {
-    
-}
+@interface CContentScrollView : UIScrollView
 
 @property (readwrite, nonatomic, strong) IBOutlet UIView *contentView;
 
