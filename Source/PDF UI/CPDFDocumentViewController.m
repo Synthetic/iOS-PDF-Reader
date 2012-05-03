@@ -20,6 +20,7 @@
 
 @property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
+@property (readwrite, nonatomic, assign) BOOL chromeHidden;
 @end
 
 @implementation CPDFDocumentViewController
@@ -95,20 +96,45 @@
     [super viewDidUnload];
     }
 
+- (void)viewDidAppear:(BOOL)animated
+    {
+    [super viewDidAppear:animated];
+
+    [self performSelector:@selector(hideChrome) withObject:NULL afterDelay:2.0];
+    }
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
     return(YES);
     }
 
+- (void)hideChrome
+    {
+    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
+//        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
+        self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
+        self.previewBar.alpha = (1.0 - !self.chromeHidden);
+        } completion:^(BOOL finished) {
+        self.chromeHidden = YES;
+        }];
+
+    }
+
+- (void)toggleChrome
+    {
+    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
+//        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
+        self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
+        self.previewBar.alpha = (1.0 - !self.chromeHidden);
+        } completion:^(BOOL finished) {
+        self.chromeHidden = !self.chromeHidden;
+        }];
+
+    }
+
 - (void)tap:(UITapGestureRecognizer *)inRecognizer
     {
-    BOOL theFlag = !self.navigationController.navigationBarHidden;
-
-    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
-        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
-        self.previewBar.alpha = (1.0 - theFlag);
-        } completion:^(BOOL finished) {
-        }];
+    [self toggleChrome];
     }
 
 - (IBAction)gotoPage:(id)sender
@@ -164,7 +190,7 @@
 
 #pragma mark -
 
-- (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation;
+- (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation
     {
     UIPageViewControllerSpineLocation theSpineLocation;
     NSArray *theViewControllers = NULL;
