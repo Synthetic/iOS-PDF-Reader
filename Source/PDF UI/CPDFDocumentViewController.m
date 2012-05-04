@@ -58,7 +58,7 @@
     {
     [super viewDidLoad];
 
-    self.title = self.document.title;
+    [self updateTitle];
 
     self.previewBar.delegate = self;
     [self.previewBar sizeToFit];
@@ -112,6 +112,11 @@
     return(YES);
     }
 
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+    {
+    [self updateTitle];
+    }
+
 - (void)hideChrome
     {
     [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
@@ -121,7 +126,6 @@
         } completion:^(BOOL finished) {
         self.chromeHidden = YES;
         }];
-
     }
 
 - (void)toggleChrome
@@ -133,7 +137,36 @@
         } completion:^(BOOL finished) {
         self.chromeHidden = !self.chromeHidden;
         }];
+    }
 
+- (void)updateTitle
+    {
+    NSArray *theViewControllers = self.pageViewController.viewControllers;
+    if (theViewControllers.count == 1)
+        {
+        CPDFPageViewController *theFirstViewController = [theViewControllers objectAtIndex:0];
+        if (theFirstViewController.page.pageNumber == 1)
+            {
+            self.title = self.document.title;
+            }
+        else
+            {
+            self.title = [NSString stringWithFormat:@"Page %d", theFirstViewController.page.pageNumber];
+            }
+        }
+    else if (theViewControllers.count == 2)
+        {
+        CPDFPageViewController *theFirstViewController = [theViewControllers objectAtIndex:0];
+        if (theFirstViewController.page.pageNumber == 1)
+            {
+            self.title = self.document.title;
+            }
+        else
+            {
+            CPDFPageViewController *theSecondViewController = [theViewControllers objectAtIndex:1];
+            self.title = [NSString stringWithFormat:@"Pages %d-%d", theFirstViewController.page.pageNumber, theSecondViewController.page.pageNumber];
+            }
+        }
     }
 
 - (void)tap:(UITapGestureRecognizer *)inRecognizer
@@ -155,7 +188,9 @@
             [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:thePageNumber + 1]]
             ];
         }
+
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
+    [self updateTitle];
     }
 
 #pragma mark -
@@ -193,6 +228,11 @@
     }
 
 #pragma mark -
+
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed;
+    {
+    [self updateTitle];
+    }
 
 - (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation
     {
