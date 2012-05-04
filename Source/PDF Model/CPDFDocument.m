@@ -14,7 +14,8 @@
 #import "PDFUtilities.h"
 
 @interface CPDFDocument ()
-@property (readwrite, assign) dispatch_queue_t queue;
+@property (readwrite, nonatomic, assign) dispatch_queue_t queue;
+@property (readwrite, nonatomic, strong) NSDictionary *pageNumbersByName;
 
 - (void)startGeneratingThumbnails;
 @end
@@ -28,6 +29,7 @@
 @synthesize delegate = _delegate;
 
 @synthesize queue = _queue;
+@synthesize pageNumbersByName = _pageNumbersByName;
 
 - (id)initWithURL:(NSURL *)inURL;
 	{
@@ -36,13 +38,6 @@
         _URL = inURL;
 
         _cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)inURL);
-
-//    CGPDFDictionaryApplyBlock(CGPDFDocumentGetCatalog(_cg), ^(const char *key, CGPDFObjectRef value) {
-//        NSLog(@"### %s", key);
-//        NSLog(@"%@", ConvertPDFObject(value));
-//        });
-
-
 
         [self startGeneratingThumbnails];
 		}
@@ -92,11 +87,93 @@
     return(thePage);
     }
 
+- (CPDFPage *)pageForPageName:(NSString *)inPageName;
+    {
+    NSNumber *thePageNumber = [self.pageNumbersByName objectForKey:inPageName];
+    if (thePageNumber != NULL)
+        {
+        return([self pageForPageNumber:thePageNumber.intValue]);
+        }
+
+    return(NULL);
+    }
+
+#pragma mark -
+
+- (NSDictionary *)pageNumbersByName
+    {
+    if (_pageNumbersByName == NULL)
+        {
+        NSMutableDictionary *thePagesByPageInfo = [NSMutableDictionary dictionary];
+        size_t theCount = self.numberOfPages;
+        for (int N = 0; N != theCount; ++N)
+            {
+            CPDFPage *thePage = [self pageForPageNumber:N + 1];
+            CGPDFDictionaryRef thePageInfo = CGPDFPageGetDictionary(thePage.cg);
+            [thePagesByPageInfo setObject:thePage forKey:[NSNumber numberWithInt:(int)thePageInfo]];
+            }
+
+
+        NSMutableDictionary *thePageNumbersForPageNames = [NSMutableDictionary dictionary];
+
+        CGPDFDictionaryRef theCatalog = CGPDFDocumentGetCatalog(self.cg);
+
+        CGPDFObjectRef theObject = NULL;
+
+    //    CGPDFDictionaryGetObject(theCatalog, "Names", &theObject);
+
+        theObject = MyCGPDFDictionaryGetObjectForPath(theCatalog, @"Names.Dests.Kids");
+
+        CGPDFArrayRef theKidsArray = NULL;
+        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeArray, &theKidsArray);
+        size_t theKidsCount = CGPDFArrayGetCount(theKidsArray);
+        for (size_t N = 0; N != theKidsCount; ++N)
+            {
+            CGPDFDictionaryRef theDictionary = NULL;
+            if (CGPDFArrayGetDictionary(theKidsArray, N, &theDictionary) == NO)
+                {
+                NSLog(@"ERROR #1");
+                }
+            CGPDFArrayRef theNamesArray = NULL;
+            if (CGPDFDictionaryGetArray(theDictionary, "Names", &theNamesArray) == NO)
+                {
+                NSLog(@"ERROR #2");
+                }
+            size_t theNamesCount = CGPDFArrayGetCount(theNamesArray);
+            for (size_t N = 0; N != theNamesCount; N += 2)
+                {
+                NSString *thePageName = MyCGPDFArrayGetString(theNamesArray, N);
+
+                CGPDFDictionaryRef theDictionary = NULL;
+                CGPDFArrayGetDictionary(theNamesArray, N + 1, &theDictionary);
+
+                CGPDFArrayRef theD = NULL;
+                CGPDFDictionaryGetArray(theDictionary, "D", &theD);
+
+                CGPDFDictionaryRef thePageDictionary = NULL;
+                CGPDFArrayGetDictionary(theD, 0, &thePageDictionary);
+
+
+
+                CPDFPage *thePage = [thePagesByPageInfo objectForKey:[NSNumber numberWithInt:(int)thePageDictionary]];
+
+                [thePageNumbersForPageNames setObject:[NSNumber numberWithInt:thePage.pageNumber] forKey:thePageName];
+                }
+            }
+
+        _pageNumbersByName = [thePageNumbersForPageNames copy];
+        }
+    return(_pageNumbersByName);
+    }
+
+#pragma mark -
+
 - (void)startGeneratingThumbnails
     {
     const size_t theNumberOfPages = CGPDFDocumentGetNumberOfPages(self.cg);
 
-    self.queue = dispatch_queue_create("com.example.MyQueue", NULL);
+    // TODO - what if there are multiple queues.
+    self.queue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^(void) {
 

@@ -24,6 +24,7 @@
 - (id)initWithURL:(NSURL *)inURL;
 
 - (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber;
+- (CPDFPage *)pageForPageName:(NSString *)inPageName;
 @end
 
 #pragma mark -

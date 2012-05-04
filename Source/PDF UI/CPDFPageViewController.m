@@ -13,8 +13,8 @@
 #import "CPDFPage.h"
 
 @interface CPDFPageViewController ()
-@property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @property (readwrite, nonatomic, strong) CPDFPage *page;
+@property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @end
 
 @implementation CPDFPageViewController
@@ -40,7 +40,6 @@
 
 - (void)loadView
     {
-    self.pageView = [[CPDFPageView alloc] init];
     self.view = self.pageView;
     }
 
@@ -54,6 +53,15 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
     return(YES);
+    }
+
+- (CPDFPageView *)pageView
+    {
+    if (_pageView == NULL)
+        {
+        _pageView = [[CPDFPageView alloc] init];
+        }
+    return(_pageView);
     }
 
 @end

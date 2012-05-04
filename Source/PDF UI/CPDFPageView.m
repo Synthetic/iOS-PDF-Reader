@@ -12,6 +12,7 @@
 #import "Geometry.h"
 #import "CPDFPage.h"
 #import "CPDFAnnotation.h"
+#import "CPDFDocument.h"
 
 @interface CPDFPageView () <UIGestureRecognizerDelegate>
 @end
@@ -37,6 +38,25 @@
         }
     return(self);
     }
+
+- (id)initWithFrame:(CGRect)inFrame
+    {
+    if ((self = [super initWithFrame:inFrame]) != NULL)
+        {
+        self.contentMode = UIViewContentModeRedraw;
+
+//        self.layer.borderColor = [UIColor purpleColor].CGColor;
+//        self.layer.borderWidth = 2.0;
+
+        UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+        theTapGestureRecognizer.delegate = self;
+        [self addGestureRecognizer:theTapGestureRecognizer];
+
+        self.userInteractionEnabled = YES;
+        }
+    return(self);
+    }
+
 
 - (void)removeFromSuperview
     {
@@ -87,6 +107,7 @@
 
 	CGContextDrawPDFPage(theContext, self.page.cg);
 
+#if 0
 	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFCropBox));
@@ -98,11 +119,13 @@
 	CGContextSetRGBStrokeColor(theContext, 0.0,0.0,0.0,1.0);
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
+#endif
 
-//    for (CPDFAnnotation *theAnnotation in self.page.annotations)
-//        {
-//        CGContextStrokeRect(theContext, theAnnotation.frame);
-//        }
+	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+        {
+        CGContextStrokeRect(theContext, theAnnotation.frame);
+        }
 
 	CGContextRestoreGState(theContext);
     }
@@ -125,19 +148,44 @@
     CPDFAnnotation *theAnnotation = [self annotationForPoint:theLocation];
     if (theAnnotation != NULL && [self isAnnotationInteractive:theAnnotation])
         {
-        NSLog(@"Annotation tapped: %@", theAnnotation);
 
-        NSString *theURLString = [theAnnotation.info objectForKey:@"URI"];
-        if (theURLString.length > 0)
+        NSString *theType = [theAnnotation.info objectForKey:@"S"];
+
+        if ([theType isEqualToString:@"URI"])
             {
-            NSURL *theURL = [NSURL URLWithString:theURLString];
-            if ([[UIApplication sharedApplication] canOpenURL:theURL])
+            NSString *theURLString = [theAnnotation.info objectForKey:@"URI"];
+            if (theURLString.length > 0)
                 {
-                [[UIApplication sharedApplication] openURL:theURL];
+                NSURL *theURL = [NSURL URLWithString:theURLString];
+
+                if ([self.delegate respondsToSelector:@selector(PDFPageView:openURL:)])
+                    {
+                    [self.delegate PDFPageView:self openURL:theURL];
+                    }
+                else
+                    {
+                    if ([[UIApplication sharedApplication] canOpenURL:theURL])
+                        {
+                        [[UIApplication sharedApplication] openURL:theURL];
+                        }
+                    }
                 }
             }
-        }
+        else if ([theType isEqualToString:@"GoTo"])
+            {
+            NSString *thePageName = [theAnnotation.info objectForKey:@"D"];
 
+            CPDFPage *thePage = [self.page.document pageForPageName:thePageName];
+            if ([self.delegate respondsToSelector:@selector(PDFPageView:openPage:)])
+                {
+                [self.delegate PDFPageView:self openPage:thePage];
+                }
+            }
+        else
+            {
+            NSLog(@"Unknown annotation tapped: %@", theAnnotation);
+            }
+        }
     }
 
 - (CPDFAnnotation *)annotationForPoint:(CGPoint)inPoint

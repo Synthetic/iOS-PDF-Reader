@@ -132,3 +132,79 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     void (^theBlock)(const char *key, CGPDFObjectRef value) = (__bridge void (^)(const char *, CGPDFObjectRef ))info;
     theBlock(key, value);
     }
+
+CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath)
+    {
+    NSArray *theComponents = [inPath componentsSeparatedByString:@"."];
+
+    CGPDFDictionaryRef theDictionary = inDictionary;
+    for (NSString *theComponent in theComponents)
+        {
+        if (theComponent != [theComponents lastObject])
+            {
+            if (CGPDFDictionaryGetDictionary(theDictionary, [theComponent UTF8String], &theDictionary) == NO)
+                {
+                return(NULL);
+                }
+            }
+        else
+            {
+            CGPDFObjectRef theObject;
+            if (CGPDFDictionaryGetObject(theDictionary, [theComponent UTF8String], &theObject) == NO)
+                {
+                return(NULL);
+                }
+            return(theObject);
+            }
+        }
+
+    return(NULL);
+    }
+
+NSString *MyCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey)
+    {
+    CGPDFObjectRef theObject = NULL;
+    CGPDFDictionaryGetObject(inDictionary, inKey, &theObject);
+
+    CGPDFObjectType theType = CGPDFObjectGetType(theObject);
+    if (theType == kCGPDFObjectTypeString)
+        {
+        CGPDFStringRef thePDFString = NULL;
+        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeString, &thePDFString);
+        return((__bridge_transfer NSString *)CGPDFStringCopyTextString(thePDFString));
+        }
+    else if (theType == kCGPDFObjectTypeName)
+        {
+        const char *theValue;
+        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeName, &theValue);
+        return([NSString stringWithUTF8String:theValue]);
+        }
+    else
+        {
+        return(NULL);
+        }
+    }
+
+NSString *MyCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N)
+    {
+    CGPDFObjectRef theObject = NULL;
+    CGPDFArrayGetObject(inArray, N, &theObject);
+
+    CGPDFObjectType theType = CGPDFObjectGetType(theObject);
+    if (theType == kCGPDFObjectTypeString)
+        {
+        CGPDFStringRef thePDFString = NULL;
+        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeString, &thePDFString);
+        return((__bridge_transfer NSString *)CGPDFStringCopyTextString(thePDFString));
+        }
+    else if (theType == kCGPDFObjectTypeName)
+        {
+        const char *theValue;
+        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeName, &theValue);
+        return([NSString stringWithUTF8String:theValue]);
+        }
+    else
+        {
+        return(NULL);
+        }
+    }

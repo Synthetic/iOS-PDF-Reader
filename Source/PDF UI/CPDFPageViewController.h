@@ -9,10 +9,12 @@
 #import <UIKit/UIKit.h>
 
 @class CPDFPage;
+@class CPDFPageView;
 
 @interface CPDFPageViewController : UIViewController
 
 @property (readonly, nonatomic, strong) CPDFPage *page;
+@property (readonly, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 
 - (id)initWithPage:(CPDFPage *)inPage;
 

@@ -10,3 +10,6 @@
 
 extern id ConvertPDFObject(CGPDFObjectRef inObject);
 extern void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value));
+extern CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath);
+extern NSString *MyCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey);
+extern NSString *MyCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N);

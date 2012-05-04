@@ -16,11 +16,13 @@
 #import "CContentScrollView.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate>
+@interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate>
 
 @property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) BOOL chromeHidden;
+
+- (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
 @end
 
 @implementation CPDFDocumentViewController
@@ -80,13 +82,13 @@
     [self.view insertSubview:self.pageViewController.view atIndex:0];
 
     NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
-        [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:1]],
+        [self pageViewControllerWithPage:[_document pageForPageNumber:1]],
         NULL
         ];
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
         [theViewControllers addObject:
-            [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:2]]
+            [self pageViewControllerWithPage:[_document pageForPageNumber:2]]
             ];
         }
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
@@ -172,6 +174,31 @@
         }
     }
 
+- (BOOL)openPage:(CPDFPage *)inPage
+    {
+    CPDFPageViewController *theCurrentPageViewController = [self.pageViewController.viewControllers objectAtIndex:0];
+    if (inPage == theCurrentPageViewController.page)
+        {
+        return(YES);
+        }
+
+    NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
+        [self pageViewControllerWithPage:inPage],
+        NULL
+        ];
+    if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
+        {
+        [theViewControllers addObject:
+            [self pageViewControllerWithPage:[_document pageForPageNumber:inPage.pageNumber + 1]]
+            ];
+        }
+
+    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
+    [self updateTitle];
+
+    return(YES);
+    }
+
 - (void)tap:(UITapGestureRecognizer *)inRecognizer
     {
     [self toggleChrome];
@@ -181,19 +208,14 @@
     {
     NSUInteger thePageNumber = self.previewBar.selectedPreviewIndex + 1;
 
-    NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
-        [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:thePageNumber]],
-        NULL
-        ];
-    if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
-        {
-        [theViewControllers addObject:
-            [[CPDFPageViewController alloc] initWithPage:[_document pageForPageNumber:thePageNumber + 1]]
-            ];
-        }
+    [self openPage:[self.document pageForPageNumber:thePageNumber]];
+    }
 
-    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
-    [self updateTitle];
+- (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
+    {
+    CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
+    thePageViewController.pageView.delegate = self;
+    return(thePageViewController);
     }
 
 #pragma mark -
@@ -209,7 +231,7 @@
         }
 
     CPDFPage *thePage = [self.document pageForPageNumber:theNextPageNumber];
-    theViewController = [[CPDFPageViewController alloc] initWithPage:thePage];
+    theViewController = [self pageViewControllerWithPage:thePage];
 
     return(theViewController);
     }
@@ -225,7 +247,7 @@
         }
 
     CPDFPage *thePage = [self.document pageForPageNumber:theNextPageNumber];
-    theViewController = [[CPDFPageViewController alloc] initWithPage:thePage];
+    theViewController = [self pageViewControllerWithPage:thePage];
 
     return(theViewController);
     }
@@ -268,8 +290,6 @@
             }
         }
 
-//    NSLog(@"%d %@", theSpineLocation, theViewControllers);
-
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
     return(theSpineLocation);
     }
@@ -292,6 +312,14 @@
 - (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPage:(CPDFPage *)inPage
     {
     [self.previewBar updatePreviewAtIndex:inPage.pageNumber - 1];
+    }
+
+#pragma mark -
+
+- (BOOL)PDFPageView:(CPDFPageView *)inPageView openPage:(CPDFPage *)inPage
+    {
+    [self openPage:inPage];
+    return(YES);
     }
 
 @end
