@@ -19,6 +19,9 @@
 
 @implementation CPDFPageViewController
 
+@synthesize pageView = _pageView;
+@synthesize page = _page;
+
 - (id)initWithPage:(CPDFPage *)inPage;
     {
     if ((self = [super initWithNibName:NSStringFromClass([self class]) bundle:NULL]) != NULL)

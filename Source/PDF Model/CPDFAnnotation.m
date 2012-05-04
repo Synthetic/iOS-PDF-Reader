@@ -18,6 +18,10 @@
 
 @implementation CPDFAnnotation
 
+@synthesize subtype = _subtype;
+@synthesize info = _info;
+@synthesize frame = _frame;
+
 - (id)initWithDictionary:(CGPDFDictionaryRef)inDictionary
     {
     if ((self = [super init]) != NULL)
