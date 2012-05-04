@@ -24,7 +24,7 @@
 
 - (id)initWithPage:(CPDFPage *)inPage;
     {
-    if ((self = [super initWithNibName:NSStringFromClass([self class]) bundle:NULL]) != NULL)
+    if ((self = [super initWithNibName:NULL bundle:NULL]) != NULL)
         {
         _page = inPage;
         }
@@ -38,9 +38,17 @@
     self.pageView.page = self.page;
     }
 
+- (void)loadView
+    {
+    self.pageView = [[CPDFPageView alloc] init];
+    self.view = self.pageView;
+    }
+
 - (void)viewDidUnload
     {
     [super viewDidUnload];
+
+    self.pageView = NULL;
     }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

@@ -98,6 +98,9 @@
 - (void)viewDidUnload
     {
     [super viewDidUnload];
+    //
+    self.pageViewController = NULL;
+    self.previewBar = NULL;
     }
 
 - (void)viewDidAppear:(BOOL)animated
