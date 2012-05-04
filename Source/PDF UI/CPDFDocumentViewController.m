@@ -25,6 +25,10 @@
 
 @implementation CPDFDocumentViewController
 
+@synthesize pageViewController = _pageViewController;
+@synthesize previewBar = _previewBar;
+@synthesize chromeHidden = _chromeHidden;
+
 @synthesize document = _document;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument

@@ -12,6 +12,8 @@
 
 @implementation CPDFAnnotationView
 
+@synthesize annotation = _annotation;
+
 - (id)initWithAnnotation:(CPDFAnnotation *)inAnnotation;
     {
     if ((self = [super initWithFrame:inAnnotation.frame]) != NULL)
