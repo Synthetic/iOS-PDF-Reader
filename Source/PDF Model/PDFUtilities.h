@@ -13,3 +13,7 @@ extern void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^in
 extern CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath);
 extern NSString *MyCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey);
 extern NSString *MyCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N);
+
+extern CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath_2(CGPDFDictionaryRef inDictionary, NSString *inPath);
+
+extern NSString *MyCGPDFObjectAsString(CGPDFObjectRef inObject);
