@@ -10,8 +10,10 @@
 
 #import "CPDFDocument.h"
 #import "PDFUtilities.h"
+#import "CPDFStream.h"
 
 @interface CPDFAnnotation ()
+@property (readwrite, nonatomic, assign) CGPDFDictionaryRef dictionary;
 @end
 
 #pragma mark -
@@ -21,11 +23,14 @@
 @synthesize subtype = _subtype;
 @synthesize info = _info;
 @synthesize frame = _frame;
+@synthesize dictionary = _dictionary;
 
 - (id)initWithDictionary:(CGPDFDictionaryRef)inDictionary
     {
     if ((self = [super init]) != NULL)
         {
+        _dictionary = inDictionary;
+
 //        CGPDFDictionaryApplyBlock(inDictionary, ^(const char *key, CGPDFObjectRef value) {
 //            NSLog(@"%s: %@", key, ConvertPDFObject(value));
 //            });
@@ -49,7 +54,6 @@
 
         CGPDFDictionaryGetObject(inDictionary, "A", &theObject);
         _info = ConvertPDFObject(theObject);
-
         }
     return self;
     }
@@ -59,5 +63,39 @@
     return([NSString stringWithFormat:@"%@ (%@, %@, %@)", [super description], self.subtype, NSStringFromCGRect(self.frame), self.info]);
     }
 
+- (CPDFStream *)stream
+    {
+    if ([self.subtype isEqualToString:@"RichMedia"])
+        {
+        NSString *theName = MyCGPDFObjectAsString(MyCGPDFDictionaryGetObjectForPath_2(self.dictionary, @"RichMediaContent.Assets.Names.#1.F"));
+        if ([[theName pathExtension] isEqualToString:@"mov"])
+            {
+            CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath_2(self.dictionary, @"RichMediaContent.Assets.Names.#1.EF.F");
+            return(ConvertPDFObject(theObject));
+            }
+        }
+    return(NULL);
+    }
+
+- (NSURL *)URL
+    {
+    if ([self.subtype isEqualToString:@"RichMedia"])
+        {
+        CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath_2(self.dictionary, @"RichMediaContent.Configurations.#0.Instances.#0.Params.FlashVars");
+        NSString *theFlashVars = MyCGPDFObjectAsString(theObject);
+
+        NSError *theError = NULL;
+        NSRegularExpression *theExpression = [NSRegularExpression regularExpressionWithPattern:@"source=((http|https)://[^&]+).+" options:0 error:&theError];
+
+        NSTextCheckingResult *theResult = [theExpression firstMatchInString:theFlashVars options:0 range:(NSRange){ .length = theFlashVars.length }];
+        if (theResult != NULL)
+            {
+            NSString *theURLString = [theFlashVars substringWithRange:[theResult rangeAtIndex:1]];
+            NSURL *theURL = [NSURL URLWithString:theURLString];
+            return(theURL);
+            }
+        }
+    return(NULL);
+    }
 
 @end

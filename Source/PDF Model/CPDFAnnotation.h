@@ -8,12 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+@class CPDFStream;
+
 @interface CPDFAnnotation : NSObject
 
 @property (readonly, nonatomic, strong) NSString *subtype;
 @property (readonly, nonatomic, assign) CGRect frame;
 @property (readonly, nonatomic, strong) NSDictionary *info;
+@property (readonly, nonatomic, assign) CGPDFDictionaryRef dictionary;
 
 - (id)initWithDictionary:(CGPDFDictionaryRef)inDictionary;
+
+- (CPDFStream *)stream;
+- (NSURL *)URL;
 
 @end

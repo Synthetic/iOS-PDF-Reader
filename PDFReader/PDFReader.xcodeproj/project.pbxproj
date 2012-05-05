@@ -16,6 +16,7 @@
 		45024C731310CF1700BB3E3D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45024C721310CF1700BB3E3D /* QuartzCore.framework */; };
 		4527B3BC1398C5F400F3ECC8 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4527B3BB1398C5F400F3ECC8 /* MobileCoreServices.framework */; };
 		453B5AD4155339FA0021607B /* CPDFObjectReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 453B5AD3155339FA0021607B /* CPDFObjectReference.m */; };
+		454BF5B41554B92600E7DE1D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 454BF5B31554B92600E7DE1D /* MediaPlayer.framework */; };
 		455699A915507139009E52FE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4556998D15507139009E52FE /* InfoPlist.strings */; };
 		455699AA15507139009E52FE /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4556998F15507139009E52FE /* MainWindow.xib */; };
 		455699B215507139009E52FE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4556999E15507139009E52FE /* main.m */; };
@@ -67,6 +68,7 @@
 		4527B3BB1398C5F400F3ECC8 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		453B5AD2155339FA0021607B /* CPDFObjectReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPDFObjectReference.h; sourceTree = "<group>"; };
 		453B5AD3155339FA0021607B /* CPDFObjectReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPDFObjectReference.m; sourceTree = "<group>"; };
+		454BF5B31554B92600E7DE1D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		4556998E15507139009E52FE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4556999015507139009E52FE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		4556999115507139009E52FE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				454BF5B41554B92600E7DE1D /* MediaPlayer.framework in Frameworks */,
 				4527B3BC1398C5F400F3ECC8 /* MobileCoreServices.framework in Frameworks */,
 				45024C731310CF1700BB3E3D /* QuartzCore.framework in Frameworks */,
 				45024C3A1310CEC100BB3E3D /* UIKit.framework in Frameworks */,
@@ -170,6 +173,7 @@
 		45024C381310CEC100BB3E3D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				454BF5B31554B92600E7DE1D /* MediaPlayer.framework */,
 				4527B3BB1398C5F400F3ECC8 /* MobileCoreServices.framework */,
 				45024C721310CF1700BB3E3D /* QuartzCore.framework */,
 				45024C391310CEC100BB3E3D /* UIKit.framework */,

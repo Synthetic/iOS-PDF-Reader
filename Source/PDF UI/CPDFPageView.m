@@ -13,9 +13,14 @@
 #import "CPDFPage.h"
 #import "CPDFAnnotation.h"
 #import "CPDFDocument.h"
+#import "CPDFAnnotationView.h"
 
 @interface CPDFPageView () <UIGestureRecognizerDelegate>
+- (CGAffineTransform)transform;
+- (void)addAnnotationViews;
 @end
+
+#pragma mark -
 
 @implementation CPDFPageView
 
@@ -57,17 +62,13 @@
     return(self);
     }
 
-
-- (void)removeFromSuperview
-    {
-    [super removeFromSuperview];
-    }
-
 - (void)setPage:(CPDFPage *)inPage
     {
     if (_page != inPage)
         {
         _page = inPage;
+
+        [self addAnnotationViews];
 
         [self setNeedsDisplay];
         }
@@ -92,15 +93,8 @@
 
     const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
 
-    const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
-
-	// Flip the context so that the PDF page is rendered right side up.
-	CGContextTranslateCTM(theContext, 0.0, self.bounds.size.height);
-	CGContextScaleCTM(theContext, 1.0, -1.0);
-
-	// Scale the context so that the PDF page is rendered at the correct size for the zoom level.
-    CGContextTranslateCTM(theContext, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
-	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
+    CGAffineTransform theTransform = [self transform];
+    CGContextConcatCTM(theContext, theTransform);
 
     CGContextSetFillColorWithColor(theContext, [UIColor whiteColor].CGColor);
     CGContextFillRect(theContext, theMediaBox);
@@ -121,6 +115,7 @@
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
 #endif
 
+#if 0
 	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
     for (CPDFAnnotation *theAnnotation in self.page.annotations)
         {
@@ -128,19 +123,79 @@
         }
 
 	CGContextRestoreGState(theContext);
+#endif
     }
+
+#pragma marl -
 
 - (BOOL)isAnnotationInteractive:(CPDFAnnotation *)inAnnotation
     {
-    if ([inAnnotation.subtype isEqualToString:@"Link"])// && [[inAnnotation.info objectForKey:@"S"] isEqualToString:@"URI"])
+    if ([inAnnotation.subtype isEqualToString:@"Link"])
         {
-        return(YES);
+        if ([[inAnnotation.info objectForKey:@"S"] isEqualToString:@"URI"])
+            {
+            return(YES);
+            }
+        else if ([[inAnnotation.info objectForKey:@"S"] isEqualToString:@"GoTo"])
+            {
+            return(YES);
+            }
         }
-    else
+    return(NO);
+    }
+
+- (CPDFAnnotation *)annotationForPoint:(CGPoint)inPoint
+    {
+    CGAffineTransform theTransform = CGAffineTransformInvert([self transform]);
+
+    inPoint = CGPointApplyAffineTransform(inPoint, theTransform);
+
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
         {
-        return(NO);
+        if (CGRectContainsPoint(theAnnotation.frame, inPoint))
+            {
+            return(theAnnotation);
+            }
+        }
+
+    return(NULL);
+    }
+
+#pragma mark -
+
+- (void)layoutSubviews
+    {
+    for (CPDFAnnotationView *theAnnotationView in self.subviews)
+        {
+        CPDFAnnotation *theAnnotation = theAnnotationView.annotation;
+        theAnnotationView.frame = CGRectApplyAffineTransform(theAnnotation.frame, [self transform]);
         }
     }
+
+- (CGAffineTransform)transform
+    {
+    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
+    const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+    CGAffineTransform theTransform = CGAffineTransformMakeTranslation(0, self.bounds.size.height);
+    theTransform = CGAffineTransformScale(theTransform, 1.0, -1.0);
+    theTransform = CGAffineTransformTranslate(theTransform, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
+    theTransform = CGAffineTransformScale(theTransform, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
+    return(theTransform);
+    }
+
+- (void)addAnnotationViews
+    {
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+        {
+        if ([theAnnotation.subtype isEqualToString:@"RichMedia"])
+            {
+            CPDFAnnotationView *theAnnotationView = [[CPDFAnnotationView alloc] initWithAnnotation:theAnnotation];
+            [self addSubview:theAnnotationView];
+            }
+        }
+    }
+
+#pragma mark -
 
 - (void)tap:(UITapGestureRecognizer *)inGestureRecognizer
     {
@@ -148,7 +203,6 @@
     CPDFAnnotation *theAnnotation = [self annotationForPoint:theLocation];
     if (theAnnotation != NULL && [self isAnnotationInteractive:theAnnotation])
         {
-
         NSString *theType = [theAnnotation.info objectForKey:@"S"];
 
         if ([theType isEqualToString:@"URI"])
@@ -188,29 +242,7 @@
         }
     }
 
-- (CPDFAnnotation *)annotationForPoint:(CGPoint)inPoint
-    {
-    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
-    const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
-    CGAffineTransform theTransform = CGAffineTransformMakeTranslation(0, self.bounds.size.height);
-    theTransform = CGAffineTransformScale(theTransform, 1.0, -1.0);
-    theTransform = CGAffineTransformTranslate(theTransform, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
-    theTransform = CGAffineTransformScale(theTransform, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
-
-    theTransform = CGAffineTransformInvert(theTransform);
-
-    inPoint = CGPointApplyAffineTransform(inPoint, theTransform);
-
-    for (CPDFAnnotation *theAnnotation in self.page.annotations)
-        {
-        if (CGRectContainsPoint(theAnnotation.frame, inPoint))
-            {
-            return(theAnnotation);
-            }
-        }
-
-    return(NULL);
-    }
+#pragma mark -
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer;
     {
