@@ -10,4 +10,10 @@
 
 @interface CPDFStream : NSObject
 
+@property (readonly, nonatomic, assign) CGPDFStreamRef stream;
+
+- (id)initWithStream:(CGPDFStreamRef)inStream;
+
+- (NSURL *)fileURLWithPathExtension:(NSString *)inPathExtension;
+
 @end
