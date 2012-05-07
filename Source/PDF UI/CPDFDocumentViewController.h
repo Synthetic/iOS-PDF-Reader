@@ -9,10 +9,16 @@
 #import <UIKit/UIKit.h>
 
 @class CPDFDocument;
+@class CContentScrollView;
+@class CPreviewBar;
 
 @interface CPDFDocumentViewController : UIViewController
 
 @property (readwrite, nonatomic, strong) CPDFDocument *document;
+
+@property (readonly, nonatomic, strong) UIPageViewController *pageViewController;
+@property (readonly, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
+@property (readonly, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, strong) UIView *backgroundView;
 
 - (id)initWithURL:(NSURL *)inURL;

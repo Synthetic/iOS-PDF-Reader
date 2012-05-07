@@ -183,8 +183,6 @@
     [self resizePageViewControllerForOrientation:toInterfaceOrientation];
     }
 
-    // 98 95 46
-
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
     {
     [self updateTitle];
