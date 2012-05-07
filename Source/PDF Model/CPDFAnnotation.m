@@ -67,10 +67,10 @@
     {
     if ([self.subtype isEqualToString:@"RichMedia"])
         {
-        NSString *theName = MyCGPDFObjectAsString(MyCGPDFDictionaryGetObjectForPath_2(self.dictionary, @"RichMediaContent.Assets.Names.#1.F"));
+        NSString *theName = MyCGPDFObjectAsString(MyCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Assets.Names.#1.F"));
         if ([[theName pathExtension] isEqualToString:@"mov"])
             {
-            CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath_2(self.dictionary, @"RichMediaContent.Assets.Names.#1.EF.F");
+            CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Assets.Names.#1.EF.F");
             return(ConvertPDFObject(theObject));
             }
         }
@@ -81,7 +81,7 @@
     {
     if ([self.subtype isEqualToString:@"RichMedia"])
         {
-        CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath_2(self.dictionary, @"RichMediaContent.Configurations.#0.Instances.#0.Params.FlashVars");
+        CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Configurations.#0.Instances.#0.Params.FlashVars");
         NSString *theFlashVars = MyCGPDFObjectAsString(theObject);
 
         NSError *theError = NULL;

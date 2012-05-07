@@ -136,7 +136,7 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     theBlock(key, value);
     }
 
-CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath_2(CGPDFDictionaryRef inDictionary, NSString *inPath)
+CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath)
     {
     NSArray *theComponents = [inPath componentsSeparatedByString:@"."];
 
@@ -167,36 +167,6 @@ CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath_2(CGPDFDictionaryRef inDictiona
         }
 
     return(theObject);
-    }
-
-
-
-CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath)
-    {
-    NSArray *theComponents = [inPath componentsSeparatedByString:@"."];
-
-    CGPDFDictionaryRef theContainer = inDictionary;
-    for (NSString *theComponent in theComponents)
-        {
-        if (theComponent != [theComponents lastObject])
-            {
-            if (CGPDFDictionaryGetDictionary(theContainer, [theComponent UTF8String], &theContainer) == NO)
-                {
-                return(NULL);
-                }
-            }
-        else
-            {
-            CGPDFObjectRef theObject;
-            if (CGPDFDictionaryGetObject(theContainer, [theComponent UTF8String], &theObject) == NO)
-                {
-                return(NULL);
-                }
-            return(theObject);
-            }
-        }
-
-    return(NULL);
     }
 
 NSString *MyCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey)
