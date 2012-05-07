@@ -90,7 +90,7 @@
     CGContextSetFillColorWithColor(theContext, [[UIColor whiteColor] colorWithAlphaComponent:0.9].CGColor);
     CGContextFillRect(theContext, self.bounds);
 
-    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
+    const CGRect theMediaBox = self.page.mediaBox;
 
     CGAffineTransform theTransform = [self transform];
     CGContextConcatCTM(theContext, theTransform);
@@ -173,7 +173,7 @@
 
 - (CGAffineTransform)transform
     {
-    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
+    const CGRect theMediaBox = self.page.mediaBox;
     const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
     CGAffineTransform theTransform = CGAffineTransformMakeTranslation(0, self.bounds.size.height);
     theTransform = CGAffineTransformScale(theTransform, 1.0, -1.0);
