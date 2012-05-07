@@ -59,6 +59,27 @@
         }
     }
 
+#pragma mark -
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len
+	{
+    NSUInteger theStartIndex = state->state;
+    NSUInteger theEndIndex = MIN(state->state + len, self.numberOfPages);
+
+    for (NSUInteger N = theStartIndex; N != theEndIndex; ++N)
+        {
+        buffer[N - theStartIndex] = [self pageForPageNumber:N];
+        }
+
+    state->state = theEndIndex;
+    state->itemsPtr = buffer;
+    state->mutationsPtr = (__bridge void *)self;
+
+    return(theEndIndex - theStartIndex);
+	}
+
+#pragma mark -
+
 - (NSUInteger)numberOfPages
     {
     return(CGPDFDocumentGetNumberOfPages(self.cg));
