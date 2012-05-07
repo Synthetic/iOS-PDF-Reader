@@ -8,16 +8,20 @@
 
 #import "CPDFDocumentViewController.h"
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "CPDFDocument.h"
+#import <QuartzCore/QuartzCore.h>
 #import "CPDFPageViewController.h"
 #import "CPDFPage.h"
 #import "CPreviewBar.h"
 #import "CPDFPageView.h"
-#import <QuartzCore/QuartzCore.h>
+#import "CContentScrollView.h"
 
 @interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate>
 
 @property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
+@property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) BOOL chromeHidden;
 
@@ -27,6 +31,7 @@
 @implementation CPDFDocumentViewController
 
 @synthesize pageViewController = _pageViewController;
+@synthesize previewScrollView = _previewScrollView;
 @synthesize previewBar = _previewBar;
 @synthesize chromeHidden = _chromeHidden;
 
@@ -34,7 +39,7 @@
 
 - (id)initWithDocument:(CPDFDocument *)inDocument
     {
-    if ((self = [super initWithNibName:@"CPDFDocumentViewController" bundle:NULL]) != NULL)
+    if ((self = [super initWithNibName:NULL bundle:NULL]) != NULL)
         {
         _document = inDocument;
         _document.delegate = self;
@@ -55,14 +60,13 @@
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad
+- (void)loadView
     {
-    [super viewDidLoad];
+    [super loadView];
 
     [self updateTitle];
 
-    self.previewBar.delegate = self;
-    [self.previewBar sizeToFit];
+    // #########################################################################
 
     UIPageViewControllerSpineLocation theSpineLocation = UIPageViewControllerSpineLocationMin;
     if (_document.numberOfPages > 1 && UIInterfaceOrientationIsLandscape([UIDevice currentDevice].orientation))
@@ -92,6 +96,33 @@
         }
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
 
+    // #########################################################################
+
+    CGRect theFrame = {
+        .origin = {
+            .x = CGRectGetMinX(self.view.bounds),
+            .y = CGRectGetMaxY(self.view.bounds) - 64,
+            },
+        .size = {
+            .width = CGRectGetWidth(self.view.bounds),
+            .height = 64,
+            },
+        };
+
+    self.previewScrollView = [[CContentScrollView alloc] initWithFrame:theFrame];
+    self.previewScrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    [self.view addSubview:self.previewScrollView];
+
+    self.previewBar = [[CPreviewBar alloc] initWithFrame:(CGRect){ .size = self.previewScrollView.bounds.size } ];
+    [self.previewBar addTarget:self action:@selector(gotoPage:) forControlEvents:UIControlEventValueChanged];
+    self.previewBar.delegate = self;
+    [self.previewBar sizeToFit];
+
+    [self.previewScrollView addSubview:self.previewBar];
+    self.previewScrollView.contentView = self.previewBar;
+
+    // #########################################################################
+
     UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
     [self.view addGestureRecognizer:theTapGestureRecognizer];
     }
@@ -101,6 +132,7 @@
     [super viewDidUnload];
     //
     self.pageViewController = NULL;
+    self.previewScrollView = NULL;
     self.previewBar = NULL;
     }
 
@@ -126,7 +158,7 @@
     [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
 //        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
         self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
-        self.previewBar.alpha = (1.0 - !self.chromeHidden);
+        self.previewScrollView.alpha = (1.0 - !self.chromeHidden);
         } completion:^(BOOL finished) {
         self.chromeHidden = YES;
         }];
@@ -137,7 +169,7 @@
     [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
 //        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
         self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
-        self.previewBar.alpha = (1.0 - !self.chromeHidden);
+        self.previewScrollView.alpha = (1.0 - !self.chromeHidden);
         } completion:^(BOOL finished) {
         self.chromeHidden = !self.chromeHidden;
         }];
@@ -171,6 +203,13 @@
             self.title = [NSString stringWithFormat:@"Pages %d-%d", theFirstViewController.page.pageNumber, theSecondViewController.page.pageNumber];
             }
         }
+    }
+
+- (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
+    {
+    CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
+    thePageViewController.pageView.delegate = self;
+    return(thePageViewController);
     }
 
 - (BOOL)openPage:(CPDFPage *)inPage
@@ -208,13 +247,6 @@
     NSUInteger thePageNumber = self.previewBar.selectedPreviewIndex + 1;
 
     [self openPage:[self.document pageForPageNumber:thePageNumber]];
-    }
-
-- (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
-    {
-    CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
-    thePageViewController.pageView.delegate = self;
-    return(thePageViewController);
     }
 
 #pragma mark -

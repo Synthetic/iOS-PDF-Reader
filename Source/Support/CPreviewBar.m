@@ -50,6 +50,33 @@
     return(self);
     }
 
+- (id)initWithFrame:(CGRect)frame
+    {
+    if ((self = [super initWithFrame:frame]) != NULL)
+        {
+        self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
+
+        _highlightColor = [UIColor redColor];
+
+        _previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
+        _previewGap = 4.0;
+
+        UIGraphicsBeginImageContextWithOptions(_previewSize, YES, 1.0);
+
+        CGContextRef theContext = UIGraphicsGetCurrentContext();
+        CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
+        CGContextFillRect(theContext, (CGRect){ .size = _previewSize });
+
+        self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+
+        self.opaque = NO;
+
+        [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)]];
+        }
+    return(self);
+    }
+
 - (void)setSelectedPreviewIndex:(NSUInteger)inSelectedPreviewIndex
     {
     if (_selectedPreviewIndex != inSelectedPreviewIndex)
