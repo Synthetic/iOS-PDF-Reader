@@ -16,6 +16,8 @@
 @property (readonly, nonatomic, assign) NSInteger pageNumber;
 @property (readonly, nonatomic, assign) CGPDFPageRef cg;
 @property (readonly, nonatomic, strong) NSArray *annotations;
+@property (readonly, nonatomic, assign) CGRect mediaBox;
+
 
 - (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
 

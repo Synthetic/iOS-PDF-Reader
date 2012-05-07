@@ -15,8 +15,6 @@
 #import "CPDFAnnotation.h"
 
 @interface CPDFPage ()
-@property (readwrite, nonatomic, weak) CPDFDocument *document;
-@property (readwrite, nonatomic, assign) NSInteger pageNumber;
 @end
 
 #pragma mark -
@@ -27,6 +25,7 @@
 @synthesize pageNumber = _pageNumber;
 @synthesize cg = _cg;
 @synthesize annotations = _annotations;
+@synthesize mediaBox = _mediaBox;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
 	{
@@ -34,6 +33,7 @@
 		{
         _document = inDocument;
         _pageNumber = inPageNumber;
+        _mediaBox = CGRectNull;
 		}
 	return(self);
 	}
@@ -61,14 +61,21 @@
     return(_cg);
     }
 
+- (CGRect)mediaBox
+    {
+    if (CGRectIsNull(_mediaBox))
+        {
+        _mediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
+        }
+    return(_mediaBox);
+    }
+
 - (UIImage *)image
     {
     UIImage *theImage = [self.document.cache objectForKey:@"image"];
     if (theImage == NULL)
         {
-        CGRect theMediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
-
-        UIGraphicsBeginImageContext(theMediaBox.size);
+        UIGraphicsBeginImageContext(self.mediaBox.size);
 
         CGContextRef theContext = UIGraphicsGetCurrentContext();
 
@@ -100,7 +107,7 @@
 	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
 
 
-    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
+    const CGRect theMediaBox = self.mediaBox;
     const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, (CGRect){ .size = inSize }, ImageScaling_Proportionally, ImageAlignment_Center);
 
 	// Flip the context so that the PDF page is rendered right side up.
