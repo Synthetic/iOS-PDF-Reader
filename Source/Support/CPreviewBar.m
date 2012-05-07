@@ -11,6 +11,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 @interface CPreviewBar ()
+- (void)setup;
 @end
 
 #pragma mark -
@@ -28,25 +29,7 @@
     {
     if ((self = [super initWithCoder:inCoder]) != NULL)
         {
-        self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
-
-        _highlightColor = [UIColor redColor];
-
-        _previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
-        _previewGap = 4.0;
-
-        UIGraphicsBeginImageContextWithOptions(_previewSize, YES, 1.0);
-
-        CGContextRef theContext = UIGraphicsGetCurrentContext();
-        CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
-        CGContextFillRect(theContext, (CGRect){ .size = _previewSize });
-
-        self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-
-        self.opaque = NO;
-
-        [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)]];
+        [self setup];
         }
     return(self);
     }
@@ -55,27 +38,32 @@
     {
     if ((self = [super initWithFrame:frame]) != NULL)
         {
-        self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
-
-        _highlightColor = [UIColor redColor];
-
-        _previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
-        _previewGap = 4.0;
-
-        UIGraphicsBeginImageContextWithOptions(_previewSize, YES, 1.0);
-
-        CGContextRef theContext = UIGraphicsGetCurrentContext();
-        CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
-        CGContextFillRect(theContext, (CGRect){ .size = _previewSize });
-
-        self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-
-        self.opaque = NO;
-
-        [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)]];
+        [self setup];
         }
     return(self);
+    }
+
+- (void)setup
+    {
+    self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
+
+    self.highlightColor = [UIColor redColor];
+
+    self.previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
+    self.previewGap = 4.0;
+
+    UIGraphicsBeginImageContextWithOptions(self.previewSize, YES, 1.0);
+
+    CGContextRef theContext = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
+    CGContextFillRect(theContext, (CGRect){ .size = self.previewSize });
+
+    self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    self.opaque = NO;
+
+    [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)]];
     }
 
 - (void)setSelectedPreviewIndex:(NSUInteger)inSelectedPreviewIndex
@@ -87,7 +75,7 @@
 
         _selectedPreviewIndex = inSelectedPreviewIndex;
         theLayer = [self.layer.sublayers objectAtIndex:_selectedPreviewIndex];
-        theLayer.borderColor = [self.highlightColor colorWithAlphaComponent:0.5].CGColor;
+        theLayer.borderColor = self.highlightColor.CGColor;
         theLayer.borderWidth = 5.0;
         }
     }
