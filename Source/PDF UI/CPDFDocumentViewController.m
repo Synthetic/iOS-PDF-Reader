@@ -39,6 +39,7 @@
 @synthesize chromeHidden = _chromeHidden;
 
 @synthesize document = _document;
+@synthesize backgroundView = _backgroundView;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument
     {
@@ -61,7 +62,20 @@
     [super didReceiveMemoryWarning];
     }
 
-#pragma mark - View lifecycle
+#pragma mark -
+
+- (void)setBackgroundView:(UIView *)backgroundView
+    {
+    if (_backgroundView != backgroundView)
+        {
+        [_backgroundView removeFromSuperview];
+
+        _backgroundView = backgroundView;
+        [self.view insertSubview:_backgroundView atIndex:0];
+        }
+    }
+
+#pragma mark -
 
 - (void)loadView
     {

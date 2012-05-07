@@ -13,6 +13,7 @@
 @interface CPDFDocumentViewController : UIViewController
 
 @property (readwrite, nonatomic, strong) CPDFDocument *document;
+@property (readwrite, nonatomic, strong) UIView *backgroundView;
 
 - (id)initWithURL:(NSURL *)inURL;
 
