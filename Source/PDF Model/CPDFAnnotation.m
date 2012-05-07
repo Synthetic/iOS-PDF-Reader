@@ -37,10 +37,10 @@
 
         CGPDFObjectRef theObject;
         CGPDFDictionaryGetObject(inDictionary, "Subtype", &theObject);
-        _subtype = ConvertPDFObject(theObject);
+        _subtype = TXConvertPDFObject(theObject);
 
         CGPDFDictionaryGetObject(inDictionary, "Rect", &theObject);
-        NSArray *theRectArray = ConvertPDFObject(theObject);
+        NSArray *theRectArray = TXConvertPDFObject(theObject);
         _frame = (CGRect){
             .origin = {
                 .x = [[theRectArray objectAtIndex:0] floatValue],
@@ -53,7 +53,7 @@
             };
 
         CGPDFDictionaryGetObject(inDictionary, "A", &theObject);
-        _info = ConvertPDFObject(theObject);
+        _info = TXConvertPDFObject(theObject);
         }
     return self;
     }
@@ -67,11 +67,11 @@
     {
     if ([self.subtype isEqualToString:@"RichMedia"])
         {
-        NSString *theName = MyCGPDFObjectAsString(MyCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Assets.Names.#1.F"));
+        NSString *theName = TXCGPDFObjectAsString(TXCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Assets.Names.#1.F"));
         if ([[theName pathExtension] isEqualToString:@"mov"])
             {
-            CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Assets.Names.#1.EF.F");
-            return(ConvertPDFObject(theObject));
+            CGPDFObjectRef theObject = TXCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Assets.Names.#1.EF.F");
+            return(TXConvertPDFObject(theObject));
             }
         }
     return(NULL);
@@ -81,8 +81,8 @@
     {
     if ([self.subtype isEqualToString:@"RichMedia"])
         {
-        CGPDFObjectRef theObject = MyCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Configurations.#0.Instances.#0.Params.FlashVars");
-        NSString *theFlashVars = MyCGPDFObjectAsString(theObject);
+        CGPDFObjectRef theObject = TXCGPDFDictionaryGetObjectForPath(self.dictionary, @"RichMediaContent.Configurations.#0.Instances.#0.Params.FlashVars");
+        NSString *theFlashVars = TXCGPDFObjectAsString(theObject);
 
         NSError *theError = NULL;
         NSRegularExpression *theExpression = [NSRegularExpression regularExpressionWithPattern:@"source=((http|https)://[^&]+).+" options:0 error:&theError];

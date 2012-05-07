@@ -14,7 +14,7 @@
 static id ConvertPDFObject_(CGPDFObjectRef inObject, NSMutableSet *convertedPointers);
 static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef value, void *info);
 
-id ConvertPDFObject(CGPDFObjectRef inObject)
+id TXConvertPDFObject(CGPDFObjectRef inObject)
     {
     return(ConvertPDFObject_(inObject, [NSMutableSet set]));
     }
@@ -103,7 +103,7 @@ static id ConvertPDFObject_(CGPDFObjectRef inObject, NSMutableSet *convertedPoin
 
             NSMutableDictionary *theDictionary = [NSMutableDictionary dictionary];
 
-            CGPDFDictionaryApplyBlock(theValue, ^(const char *key, CGPDFObjectRef value) {
+            TXCGPDFDictionaryApplyBlock(theValue, ^(const char *key, CGPDFObjectRef value) {
                 NSString *theKey = [NSString stringWithUTF8String:key];
                 id theObject = NULL;
                 theObject = ConvertPDFObject_(value, convertedPointers);
@@ -125,7 +125,7 @@ static id ConvertPDFObject_(CGPDFObjectRef inObject, NSMutableSet *convertedPoin
     }
 
 
-void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value))
+void TXCGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value))
     {
     CGPDFDictionaryApplyFunction(inDictionary, MyCGPDFDictionaryApplierFunction, (__bridge void *)inBlock);
     }
@@ -136,7 +136,7 @@ static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef val
     theBlock(key, value);
     }
 
-CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath)
+CGPDFObjectRef TXCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath)
     {
     NSArray *theComponents = [inPath componentsSeparatedByString:@"."];
 
@@ -169,21 +169,21 @@ CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary
     return(theObject);
     }
 
-NSString *MyCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey)
+NSString *TXCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey)
     {
     CGPDFObjectRef theObject = NULL;
     CGPDFDictionaryGetObject(inDictionary, inKey, &theObject);
-    return(MyCGPDFObjectAsString(theObject));
+    return(TXCGPDFObjectAsString(theObject));
     }
 
-NSString *MyCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N)
+NSString *TXCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N)
     {
     CGPDFObjectRef theObject = NULL;
     CGPDFArrayGetObject(inArray, N, &theObject);
-    return(MyCGPDFObjectAsString(theObject));
+    return(TXCGPDFObjectAsString(theObject));
     }
 
-NSString *MyCGPDFObjectAsString(CGPDFObjectRef inObject)
+NSString *TXCGPDFObjectAsString(CGPDFObjectRef inObject)
     {
     CGPDFObjectType theType = CGPDFObjectGetType(inObject);
     if (theType == kCGPDFObjectTypeString)

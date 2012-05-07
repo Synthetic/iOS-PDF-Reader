@@ -143,7 +143,7 @@
 
     //    CGPDFDictionaryGetObject(theCatalog, "Names", &theObject);
 
-        theObject = MyCGPDFDictionaryGetObjectForPath(theCatalog, @"Names.Dests.Kids");
+        theObject = TXCGPDFDictionaryGetObjectForPath(theCatalog, @"Names.Dests.Kids");
 
         CGPDFArrayRef theKidsArray = NULL;
         CGPDFObjectGetValue(theObject, kCGPDFObjectTypeArray, &theKidsArray);
@@ -163,7 +163,7 @@
             size_t theNamesCount = CGPDFArrayGetCount(theNamesArray);
             for (size_t N = 0; N != theNamesCount; N += 2)
                 {
-                NSString *thePageName = MyCGPDFArrayGetString(theNamesArray, N);
+                NSString *thePageName = TXCGPDFArrayGetString(theNamesArray, N);
 
                 CGPDFDictionaryRef theDictionary = NULL;
                 CGPDFArrayGetDictionary(theNamesArray, N + 1, &theDictionary);

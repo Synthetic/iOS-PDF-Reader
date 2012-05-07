@@ -8,11 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-extern id ConvertPDFObject(CGPDFObjectRef inObject);
-extern void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value));
-extern NSString *MyCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey);
-extern NSString *MyCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N);
+extern id TXConvertPDFObject(CGPDFObjectRef inObject);
+extern void TXCGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value));
+extern NSString *TXCGPDFDictionaryGetString(CGPDFDictionaryRef inDictionary, const char *inKey);
+extern NSString *TXCGPDFArrayGetString(CGPDFArrayRef inArray, size_t N);
 
-extern CGPDFObjectRef MyCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath);
+extern CGPDFObjectRef TXCGPDFDictionaryGetObjectForPath(CGPDFDictionaryRef inDictionary, NSString *inPath);
 
-extern NSString *MyCGPDFObjectAsString(CGPDFObjectRef inObject);
+extern NSString *TXCGPDFObjectAsString(CGPDFObjectRef inObject);
