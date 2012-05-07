@@ -29,6 +29,8 @@
         {
         self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
 
+        _highlightColor = [UIColor redColor];
+
         _previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
         _previewGap = 4.0;
 
@@ -57,7 +59,7 @@
 
         _selectedPreviewIndex = inSelectedPreviewIndex;
         theLayer = [self.layer.sublayers objectAtIndex:_selectedPreviewIndex];
-        theLayer.borderColor = [[UIColor redColor] colorWithAlphaComponent:0.5].CGColor;
+        theLayer.borderColor = [self.highlightColor colorWithAlphaComponent:0.5].CGColor;
         theLayer.borderWidth = 5.0;
         }
     }
