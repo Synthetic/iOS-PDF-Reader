@@ -27,7 +27,7 @@
 
 - (void)hideChrome;
 - (void)toggleChrome;
-- (BOOL)canDoubleSpreadForOridentation:(UIInterfaceOrientation)inOrientation;
+- (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation;
 - (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation;
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
 @end
@@ -86,7 +86,7 @@
 
     // #########################################################################
     UIPageViewControllerSpineLocation theSpineLocation;
-    if ([self canDoubleSpreadForOridentation:self.interfaceOrientation] == YES)
+    if ([self canDoubleSpreadForOrientation:self.interfaceOrientation] == YES)
         {
         theSpineLocation = UIPageViewControllerSpineLocationMid;
         }
@@ -240,7 +240,7 @@
         }
     }
 
-- (BOOL)canDoubleSpreadForOridentation:(UIInterfaceOrientation)inOrientation
+- (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation
     {
     if (UIInterfaceOrientationIsPortrait(inOrientation) || self.document.numberOfPages == 1)
         {
@@ -257,7 +257,7 @@
     CGRect theBounds = self.view.bounds;
     CGRect theFrame;
     CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
-    if ([self canDoubleSpreadForOridentation:inOrientation] == YES)
+    if ([self canDoubleSpreadForOrientation:inOrientation] == YES)
         {
         theMediaBox.size.width *= 2;
         theFrame = ScaleAndAlignRectToRect(theMediaBox, theBounds, ImageScaling_Proportionally, ImageAlignment_Center);
