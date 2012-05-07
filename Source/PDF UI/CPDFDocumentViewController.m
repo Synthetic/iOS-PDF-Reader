@@ -353,6 +353,11 @@
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed;
     {
     [self updateTitle];
+
+
+    CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
+
+    self.previewBar.selectedPreviewIndex = theFirstViewController.page.pageNumber - 1;
     }
 
 - (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation
