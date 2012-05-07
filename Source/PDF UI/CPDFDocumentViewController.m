@@ -28,6 +28,7 @@
 - (void)hideChrome;
 - (void)toggleChrome;
 - (BOOL)canDoubleSpreadForOridentation:(UIInterfaceOrientation)inOrientation;
+- (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation;
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
 @end
 
@@ -84,12 +85,17 @@
     [self updateTitle];
 
     // #########################################################################
-
-    UIPageViewControllerSpineLocation theSpineLocation = UIPageViewControllerSpineLocationMin;
-    if (_document.numberOfPages > 1 && UIInterfaceOrientationIsLandscape([UIDevice currentDevice].orientation))
+    UIPageViewControllerSpineLocation theSpineLocation;
+    if ([self canDoubleSpreadForOridentation:self.interfaceOrientation] == YES)
         {
         theSpineLocation = UIPageViewControllerSpineLocationMid;
         }
+    else
+        {
+        theSpineLocation = UIPageViewControllerSpineLocationMin;
+        }
+
+    // #########################################################################
     NSDictionary *theOptions = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithInt:theSpineLocation], UIPageViewControllerOptionSpineLocationKey,
         NULL];
@@ -97,22 +103,6 @@
     self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStylePageCurl navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:theOptions];
     self.pageViewController.delegate = self;
     self.pageViewController.dataSource = self;
-    [self addChildViewController:self.pageViewController];
-
-    CGRect theFrame;
-    CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
-    if ([self canDoubleSpreadForOridentation:self.interfaceOrientation] == YES)
-        {
-        theMediaBox.size.width *= 2;
-        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
-        }
-    else
-        {
-        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
-        }
-    self.pageViewController.view.frame = theFrame;
-
-    [self.view insertSubview:self.pageViewController.view atIndex:0];
 
     NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
         [self pageViewControllerWithPage:[_document pageForPageNumber:1]],
@@ -126,9 +116,12 @@
         }
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
 
+    [self addChildViewController:self.pageViewController];
+    [self.view insertSubview:self.pageViewController.view atIndex:0];
+
     // #########################################################################
 
-    theFrame = (CGRect){
+    CGRect theFrame = (CGRect){
         .origin = {
             .x = CGRectGetMinX(self.view.bounds),
             .y = CGRectGetMaxY(self.view.bounds) - 64,
@@ -166,6 +159,13 @@
     self.previewBar = NULL;
     }
 
+- (void)viewWillAppear:(BOOL)animated
+    {
+    [super viewWillAppear:animated];
+    //
+    [self resizePageViewControllerForOrientation:self.interfaceOrientation];
+    }
+
 - (void)viewDidAppear:(BOOL)animated
     {
     [super viewDidAppear:animated];
@@ -180,19 +180,10 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
     {
-    CGRect theFrame;
-    CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
-    if ([self canDoubleSpreadForOridentation:toInterfaceOrientation] == YES)
-        {
-        theMediaBox.size.width *= 2;
-        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
-        }
-    else
-        {
-        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
-        }
-    self.pageViewController.view.frame = theFrame;
+    [self resizePageViewControllerForOrientation:toInterfaceOrientation];
     }
+
+    // 98 95 46
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
     {
@@ -259,6 +250,26 @@
         {
         return(YES);
         }
+    }
+
+- (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation
+    {
+    CGRect theBounds = self.view.bounds;
+    CGRect theFrame;
+    CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
+    if ([self canDoubleSpreadForOridentation:inOrientation] == YES)
+        {
+        theMediaBox.size.width *= 2;
+        theFrame = ScaleAndAlignRectToRect(theMediaBox, theBounds, ImageScaling_Proportionally, ImageAlignment_Center);
+        }
+    else
+        {
+        theFrame = ScaleAndAlignRectToRect(theMediaBox, theBounds, ImageScaling_Proportionally, ImageAlignment_Center);
+        }
+
+    theFrame = CGRectIntegral(theFrame);
+
+    self.pageViewController.view.frame = theFrame;
     }
 
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
