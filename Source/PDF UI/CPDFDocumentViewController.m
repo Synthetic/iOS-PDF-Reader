@@ -11,12 +11,12 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "CPDFDocument.h"
-#import <QuartzCore/QuartzCore.h>
 #import "CPDFPageViewController.h"
 #import "CPDFPage.h"
 #import "CPreviewBar.h"
 #import "CPDFPageView.h"
 #import "CContentScrollView.h"
+#import "Geometry.h"
 
 @interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate>
 
@@ -25,6 +25,9 @@
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) BOOL chromeHidden;
 
+- (void)hideChrome;
+- (void)toggleChrome;
+- (BOOL)canDoubleSpreadForOridentation:(UIInterfaceOrientation)inOrientation;
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
 @end
 
@@ -81,7 +84,20 @@
     self.pageViewController.delegate = self;
     self.pageViewController.dataSource = self;
     [self addChildViewController:self.pageViewController];
-    self.pageViewController.view.frame = self.view.bounds;
+
+    CGRect theFrame;
+    CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
+    if ([self canDoubleSpreadForOridentation:self.interfaceOrientation] == YES)
+        {
+        theMediaBox.size.width *= 2;
+        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+        }
+    else
+        {
+        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+        }
+    self.pageViewController.view.frame = theFrame;
+
     [self.view insertSubview:self.pageViewController.view atIndex:0];
 
     NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
@@ -98,7 +114,7 @@
 
     // #########################################################################
 
-    CGRect theFrame = {
+    theFrame = (CGRect){
         .origin = {
             .x = CGRectGetMinX(self.view.bounds),
             .y = CGRectGetMaxY(self.view.bounds) - 64,
@@ -148,6 +164,22 @@
     return(YES);
     }
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+    {
+    CGRect theFrame;
+    CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
+    if ([self canDoubleSpreadForOridentation:toInterfaceOrientation] == YES)
+        {
+        theMediaBox.size.width *= 2;
+        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+        }
+    else
+        {
+        theFrame = ScaleAndAlignRectToRect(theMediaBox, self.view.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+        }
+    self.pageViewController.view.frame = theFrame;
+    }
+
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
     {
     [self updateTitle];
@@ -156,7 +188,6 @@
 - (void)hideChrome
     {
     [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
-//        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
         self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
         self.previewScrollView.alpha = (1.0 - !self.chromeHidden);
         } completion:^(BOOL finished) {
@@ -167,7 +198,6 @@
 - (void)toggleChrome
     {
     [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
-//        [self.navigationController setNavigationBarHidden:theFlag animated:YES];
         self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
         self.previewScrollView.alpha = (1.0 - !self.chromeHidden);
         } completion:^(BOOL finished) {
@@ -202,6 +232,18 @@
             CPDFPageViewController *theSecondViewController = [theViewControllers objectAtIndex:1];
             self.title = [NSString stringWithFormat:@"Pages %d-%d", theFirstViewController.page.pageNumber, theSecondViewController.page.pageNumber];
             }
+        }
+    }
+
+- (BOOL)canDoubleSpreadForOridentation:(UIInterfaceOrientation)inOrientation
+    {
+    if (UIInterfaceOrientationIsPortrait(inOrientation) || self.document.numberOfPages == 1)
+        {
+        return(NO);
+        }
+    else
+        {
+        return(YES);
         }
     }
 
