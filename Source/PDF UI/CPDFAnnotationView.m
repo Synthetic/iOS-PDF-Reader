@@ -50,8 +50,6 @@
 
         if (theURL)
             {
-            NSLog(@"%@", theURL);
-
             self.moviePlayer = [[MPMoviePlayerController alloc] initWithContentURL:theURL];
             self.moviePlayer.view.frame = self.bounds;
             self.moviePlayer.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
