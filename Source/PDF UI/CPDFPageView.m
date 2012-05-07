@@ -23,6 +23,7 @@
 
 @implementation CPDFPageView
 
+@synthesize delegate = _delegate;
 @synthesize page = _page;
 
 - (id)initWithCoder:(NSCoder *)inCoder

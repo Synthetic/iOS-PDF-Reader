@@ -10,6 +10,8 @@
 
 @implementation CPDFStream
 
+@synthesize stream = _stream;
+
 - (id)initWithStream:(CGPDFStreamRef)inStream
     {
     if ((self = [super init]) != NULL)

@@ -17,6 +17,7 @@
 
 @implementation CPreviewBar
 
+@synthesize highlightColor = _highlightColor;
 @synthesize selectedPreviewIndex = _selectedPreviewIndex;
 @synthesize previewSize = _previewSize;
 @synthesize previewGap = _previewGap;
