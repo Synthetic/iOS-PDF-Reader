@@ -8,7 +8,6 @@
 
 #import "CPDFPageView.h"
 
-#import "CFastTiledLayer.h"
 #import "Geometry.h"
 #import "CPDFPage.h"
 #import "CPDFAnnotation.h"

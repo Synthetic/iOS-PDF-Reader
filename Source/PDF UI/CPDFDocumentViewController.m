@@ -13,7 +13,6 @@
 #import "CPDFPage.h"
 #import "CPreviewBar.h"
 #import "CPDFPageView.h"
-#import "CContentScrollView.h"
 #import <QuartzCore/QuartzCore.h>
 
 @interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate>

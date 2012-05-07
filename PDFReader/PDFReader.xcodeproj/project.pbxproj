@@ -32,8 +32,6 @@
 		455699DA15507141009E52FE /* CPDFDocumentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699C715507141009E52FE /* CPDFDocumentViewController.m */; };
 		455699DD15507141009E52FE /* CPDFPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699CC15507141009E52FE /* CPDFPageView.m */; };
 		455699E515507148009E52FE /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699E415507148009E52FE /* Geometry.m */; };
-		455699F5155071A5009E52FE /* CContentScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699E8155071A5009E52FE /* CContentScrollView.m */; };
-		455699F6155071A5009E52FE /* CFastTiledLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699EA155071A5009E52FE /* CFastTiledLayer.m */; };
 		455699F8155071A5009E52FE /* CPagingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699EE155071A5009E52FE /* CPagingView.m */; };
 		455699F9155071A5009E52FE /* CPersistentCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699F0155071A5009E52FE /* CPersistentCache.m */; };
 		455699FA155071A5009E52FE /* CPreviewBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 455699F2155071A5009E52FE /* CPreviewBar.m */; };
@@ -97,10 +95,6 @@
 		455699CC15507141009E52FE /* CPDFPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPDFPageView.m; sourceTree = "<group>"; };
 		455699E315507148009E52FE /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		455699E415507148009E52FE /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
-		455699E7155071A5009E52FE /* CContentScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CContentScrollView.h; sourceTree = "<group>"; };
-		455699E8155071A5009E52FE /* CContentScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CContentScrollView.m; sourceTree = "<group>"; };
-		455699E9155071A5009E52FE /* CFastTiledLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CFastTiledLayer.h; sourceTree = "<group>"; };
-		455699EA155071A5009E52FE /* CFastTiledLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CFastTiledLayer.m; sourceTree = "<group>"; };
 		455699ED155071A5009E52FE /* CPagingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPagingView.h; sourceTree = "<group>"; };
 		455699EE155071A5009E52FE /* CPagingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPagingView.m; sourceTree = "<group>"; };
 		455699EF155071A5009E52FE /* CPersistentCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPersistentCache.h; sourceTree = "<group>"; };
@@ -308,10 +302,6 @@
 		455699E6155071A5009E52FE /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				455699E7155071A5009E52FE /* CContentScrollView.h */,
-				455699E8155071A5009E52FE /* CContentScrollView.m */,
-				455699E9155071A5009E52FE /* CFastTiledLayer.h */,
-				455699EA155071A5009E52FE /* CFastTiledLayer.m */,
 				455699ED155071A5009E52FE /* CPagingView.h */,
 				455699EE155071A5009E52FE /* CPagingView.m */,
 				455699EF155071A5009E52FE /* CPersistentCache.h */,
@@ -444,8 +434,6 @@
 				455699DA15507141009E52FE /* CPDFDocumentViewController.m in Sources */,
 				455699DD15507141009E52FE /* CPDFPageView.m in Sources */,
 				455699E515507148009E52FE /* Geometry.m in Sources */,
-				455699F5155071A5009E52FE /* CContentScrollView.m in Sources */,
-				455699F6155071A5009E52FE /* CFastTiledLayer.m in Sources */,
 				455699F8155071A5009E52FE /* CPagingView.m in Sources */,
 				455699F9155071A5009E52FE /* CPersistentCache.m in Sources */,
 				455699FA155071A5009E52FE /* CPreviewBar.m in Sources */,
