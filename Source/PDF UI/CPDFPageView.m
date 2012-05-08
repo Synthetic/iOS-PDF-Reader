@@ -25,6 +25,7 @@
 
 @synthesize delegate = _delegate;
 @synthesize page = _page;
+@synthesize renderedPageCache = _renderedPageCache;
 
 - (id)initWithCoder:(NSCoder *)inCoder
     {
@@ -83,23 +84,31 @@
 
     CGContextRef theContext = UIGraphicsGetCurrentContext();
 
-	CGContextSaveGState(theContext);
+    CGContextSaveGState(theContext);
 
-	// First fill the background with white.
-	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-
+    // First fill the background with white.
+    CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
     CGContextSetFillColorWithColor(theContext, [[UIColor whiteColor] colorWithAlphaComponent:0.9].CGColor);
     CGContextFillRect(theContext, self.bounds);
 
-    const CGRect theMediaBox = self.page.mediaBox;
-
-    CGAffineTransform theTransform = [self transform];
-    CGContextConcatCTM(theContext, theTransform);
+    const CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self transform]));
 
     CGContextSetFillColorWithColor(theContext, [UIColor whiteColor].CGColor);
     CGContextFillRect(theContext, theMediaBox);
 
-	CGContextDrawPDFPage(theContext, self.page.cg);
+
+    UIImage *theCachedImage = [self.renderedPageCache objectForKey:[NSString stringWithFormat:@"%d[%d,%d]", self.page.pageNumber, (int)self.bounds.size.width, (int)self.bounds.size.height]];
+    if (theCachedImage != NULL)
+        {
+        [theCachedImage drawInRect:self.bounds];
+        }
+    else
+        {
+        CGAffineTransform theTransform = [self transform];
+        CGContextConcatCTM(theContext, theTransform);
+
+        CGContextDrawPDFPage(theContext, self.page.cg);
+        }
 
 #if 0
 	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
@@ -122,8 +131,9 @@
         CGContextStrokeRect(theContext, theAnnotation.frame);
         }
 
-	CGContextRestoreGState(theContext);
 #endif
+
+    CGContextRestoreGState(theContext);
     }
 
 #pragma marl -

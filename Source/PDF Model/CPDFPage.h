@@ -18,7 +18,6 @@
 @property (readonly, nonatomic, strong) NSArray *annotations;
 @property (readonly, nonatomic, assign) CGRect mediaBox;
 
-
 - (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
 
 - (UIImage *)image;

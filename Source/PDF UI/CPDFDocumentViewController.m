@@ -24,6 +24,7 @@
 @property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) BOOL chromeHidden;
+@property (readwrite, nonatomic, strong) NSCache *renderedPageCache;
 
 - (void)hideChrome;
 - (void)toggleChrome;
@@ -38,6 +39,7 @@
 @synthesize previewScrollView = _previewScrollView;
 @synthesize previewBar = _previewBar;
 @synthesize chromeHidden = _chromeHidden;
+@synthesize renderedPageCache = _renderedPageCache;
 
 @synthesize document = _document;
 @synthesize backgroundView = _backgroundView;
@@ -48,6 +50,8 @@
         {
         _document = inDocument;
         _document.delegate = self;
+        _renderedPageCache = [[NSCache alloc] init];
+        _renderedPageCache.countLimit = 8;
         }
     return(self);
     }
@@ -164,6 +168,8 @@
     [super viewWillAppear:animated];
     //
     [self resizePageViewControllerForOrientation:self.interfaceOrientation];
+
+    [self populateCache];
     }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -186,6 +192,8 @@
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
     {
     [self updateTitle];
+    [self.renderedPageCache removeAllObjects];
+    [self populateCache];
     }
 
 - (void)hideChrome
@@ -274,6 +282,7 @@
     {
     CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
     thePageViewController.pageView.delegate = self;
+    thePageViewController.pageView.renderedPageCache = self.renderedPageCache;
     return(thePageViewController);
     }
 
@@ -298,6 +307,7 @@
 
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
     [self updateTitle];
+    [self populateCache];
 
     return(YES);
     }
@@ -312,6 +322,36 @@
     NSUInteger thePageNumber = self.previewBar.selectedPreviewIndex + 1;
 
     [self openPage:[self.document pageForPageNumber:thePageNumber]];
+    }
+
+- (NSArray *)pages
+    {
+    return([self.pageViewController.viewControllers valueForKey:@"page"]);
+    }
+
+- (void)populateCache
+    {
+    NSInteger theStartPage = [[self.pages objectAtIndex:0] pageNumber];
+    NSInteger theLastPage = [[self.pages lastObject] pageNumber];
+
+    theStartPage = MAX(theStartPage - 2, 1);
+    theLastPage = MIN(theLastPage + 2, self.document.numberOfPages);
+
+    NSLog(@"(Potentially) Fetching: %d - %d", theStartPage, theLastPage);
+
+    CGRect theBounds = [[self.pageViewController.viewControllers objectAtIndex:0] pageView].bounds;
+
+    for (NSInteger thePageNumber = theStartPage; thePageNumber <= theLastPage; ++thePageNumber)
+        {
+        NSString *theKey = [NSString stringWithFormat:@"%d[%d,%d]", thePageNumber, (int)theBounds.size.width, (int)theBounds.size.height];
+        if ([self.renderedPageCache objectForKey:theKey] == NULL)
+            {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+                UIImage *theImage = [[self.document pageForPageNumber:thePageNumber] imageWithSize:theBounds.size];
+                [self.renderedPageCache setObject:theImage forKey:theKey];
+                });
+            }
+        }
     }
 
 #pragma mark -
@@ -353,7 +393,7 @@
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed;
     {
     [self updateTitle];
-
+    [self populateCache];
 
     CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
 

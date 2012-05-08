@@ -63,11 +63,7 @@
 
 - (CGRect)mediaBox
     {
-    if (CGRectIsNull(_mediaBox))
-        {
-        _mediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
-        }
-    return(_mediaBox);
+    return(CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox));
     }
 
 - (UIImage *)image
