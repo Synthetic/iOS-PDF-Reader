@@ -6,14 +6,15 @@ More details coming soon.
 
 See License.txt
 
+## Features
+
+* Uses iOS UIPageViewController to get the cool page curl animation.
+* Single page and side by side page modes.
+* Supports internal (page) and external links
+* Supports embedded and streaming videos
+
 ## TODO
 
 * (Re)Add Dropbox support
-
-* Landscape/portrait mode
-
-* Fix memory problems (there's an over-release in there somewhere)
-
 * Better Library screen
-
 * Remember reading locations.
