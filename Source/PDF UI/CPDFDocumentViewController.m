@@ -109,16 +109,12 @@
     self.pageViewController.delegate = self;
     self.pageViewController.dataSource = self;
 
-    NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
-        [self pageViewControllerWithPage:[_document pageForPageNumber:1]],
-        NULL
-        ];
+    NSRange theRange = { .location = 1, .length = 1 };
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
-        [theViewControllers addObject:
-            [self pageViewControllerWithPage:[_document pageForPageNumber:2]]
-            ];
+        theRange.length = 2;
         }
+    NSArray *theViewControllers = [self pageViewControllersForRange:theRange];
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
 
     [self addChildViewController:self.pageViewController];
@@ -252,18 +248,6 @@
         }
     }
 
-- (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation
-    {
-    if (UIInterfaceOrientationIsPortrait(inOrientation) || self.document.numberOfPages == 1)
-        {
-        return(NO);
-        }
-    else
-        {
-        return(YES);
-        }
-    }
-
 - (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation
     {
     CGRect theBounds = self.view.bounds;
@@ -284,6 +268,31 @@
     self.pageViewController.view.frame = theFrame;
     }
 
+#pragma mark -
+
+- (NSArray *)pageViewControllersForRange:(NSRange)inRange
+    {
+    NSMutableArray *thePages = [NSMutableArray array];
+    for (NSUInteger N = inRange.location; N != inRange.location + inRange.length; ++N)
+        {
+        CPDFPage *thePage = [self.document pageForPageNumber:N];
+        [thePages addObject:[self pageViewControllerWithPage:thePage]];
+        }
+    return(thePages);
+    }
+
+- (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation
+    {
+    if (UIInterfaceOrientationIsPortrait(inOrientation) || self.document.numberOfPages == 1)
+        {
+        return(NO);
+        }
+    else
+        {
+        return(YES);
+        }
+    }
+
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
     {
     CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
@@ -291,6 +300,13 @@
     thePageViewController.pageView.renderedPageCache = self.renderedPageCache;
     return(thePageViewController);
     }
+
+- (NSArray *)pages
+    {
+    return([self.pageViewController.viewControllers valueForKey:@"page"]);
+    }
+
+#pragma mark -
 
 - (BOOL)openPage:(CPDFPage *)inPage
     {
@@ -300,16 +316,13 @@
         return(YES);
         }
 
-    NSMutableArray *theViewControllers = [NSMutableArray arrayWithObjects:
-        [self pageViewControllerWithPage:inPage],
-        NULL
-        ];
+
+    NSRange theRange = { .location = inPage.pageNumber, .length = 1 };
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
-        [theViewControllers addObject:
-            [self pageViewControllerWithPage:[_document pageForPageNumber:inPage.pageNumber + 1]]
-            ];
+        theRange.length = 2;
         }
+    NSArray *theViewControllers = [self pageViewControllersForRange:theRange];
 
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
     [self updateTitle];
@@ -330,18 +343,15 @@
     [self openPage:[self.document pageForPageNumber:thePageNumber]];
     }
 
-- (NSArray *)pages
-    {
-    return([self.pageViewController.viewControllers valueForKey:@"page"]);
-    }
-
 - (void)populateCache
     {
+    NSLog(@"POPULATING CACHE");
+
     NSInteger theStartPage = [[self.pages objectAtIndex:0] pageNumber];
     NSInteger theLastPage = [[self.pages lastObject] pageNumber];
 
-    theStartPage = MAX(theStartPage - 2, 1);
-    theLastPage = MIN(theLastPage + 2, self.document.numberOfPages);
+    theStartPage = MAX(theStartPage - 1, 1);
+    theLastPage = MIN(theLastPage + 1, self.document.numberOfPages);
 
     NSLog(@"(Potentially) Fetching: %d - %d", theStartPage, theLastPage);
 
