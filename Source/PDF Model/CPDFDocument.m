@@ -190,7 +190,7 @@
 
 - (void)startGeneratingThumbnails
     {
-    NSLog(@"START GENERATING THUMBNAILS");
+//    NSLog(@"START GENERATING THUMBNAILS");
 
     const size_t theNumberOfPages = CGPDFDocumentGetNumberOfPages(self.cg);
 

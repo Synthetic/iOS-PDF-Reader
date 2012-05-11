@@ -112,7 +112,7 @@
     NSRange theRange = { .location = 1, .length = 1 };
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
-        theRange.length = 2;
+        theRange = (NSRange){ .location = 0, .length = 2 };
         }
     NSArray *theViewControllers = [self pageViewControllersForRange:theRange];
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
@@ -275,7 +275,7 @@
     NSMutableArray *thePages = [NSMutableArray array];
     for (NSUInteger N = inRange.location; N != inRange.location + inRange.length; ++N)
         {
-        CPDFPage *thePage = [self.document pageForPageNumber:N];
+        CPDFPage *thePage = N > 0 ? [self.document pageForPageNumber:N] : NULL;
         [thePages addObject:[self pageViewControllerWithPage:thePage]];
         }
     return(thePages);
@@ -316,7 +316,6 @@
         return(YES);
         }
 
-
     NSRange theRange = { .location = inPage.pageNumber, .length = 1 };
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
@@ -345,19 +344,22 @@
 
 - (void)populateCache
     {
-    NSLog(@"POPULATING CACHE");
+//    NSLog(@"POPULATING CACHE")
 
-    NSInteger theStartPage = [[self.pages objectAtIndex:0] pageNumber];
-    NSInteger theLastPage = [[self.pages lastObject] pageNumber];
+    CPDFPage *theStartPage = [self.pages objectAtIndex:0] != [NSNull null] ? [self.pages objectAtIndex:0] : NULL;
+    CPDFPage *theLastPage = [self.pages lastObject] != [NSNull null] ? [self.pages lastObject] : NULL;
 
-    theStartPage = MAX(theStartPage - 1, 1);
-    theLastPage = MIN(theLastPage + 1, self.document.numberOfPages);
+    NSInteger theStartPageNumber = [theStartPage pageNumber];
+    NSInteger theLastPageNumber = [theLastPage pageNumber];
 
-    NSLog(@"(Potentially) Fetching: %d - %d", theStartPage, theLastPage);
+    theStartPageNumber = MAX(theStartPageNumber - 1, 0);
+    theLastPageNumber = MIN(theLastPageNumber + 1, self.document.numberOfPages);
+
+//    NSLog(@"(Potentially) Fetching: %d - %d", theStartPage, theLastPage);
 
     CGRect theBounds = [[self.pageViewController.viewControllers objectAtIndex:0] pageView].bounds;
 
-    for (NSInteger thePageNumber = theStartPage; thePageNumber <= theLastPage; ++thePageNumber)
+    for (NSInteger thePageNumber = theStartPageNumber; thePageNumber <= theLastPageNumber; ++thePageNumber)
         {
         NSString *theKey = [NSString stringWithFormat:@"%d[%d,%d]", thePageNumber, (int)theBounds.size.width, (int)theBounds.size.height];
         if ([self.renderedPageCache objectForKey:theKey] == NULL)
@@ -377,12 +379,17 @@
     CPDFPageViewController *theViewController = (CPDFPageViewController *)viewController;
 
     NSUInteger theNextPageNumber = theViewController.page.pageNumber - 1;
-    if (theNextPageNumber < 1 || theNextPageNumber > self.document.numberOfPages)
+    if (theNextPageNumber > self.document.numberOfPages)
         {
         return(NULL);
         }
 
-    CPDFPage *thePage = [self.document pageForPageNumber:theNextPageNumber];
+    if (theNextPageNumber == 0 && UIInterfaceOrientationIsPortrait(self.interfaceOrientation))
+        {
+        return(NULL);
+        }
+
+    CPDFPage *thePage = theNextPageNumber > 0 ? [self.document pageForPageNumber:theNextPageNumber] : NULL;
     theViewController = [self pageViewControllerWithPage:thePage];
 
     return(theViewController);
@@ -393,12 +400,12 @@
     CPDFPageViewController *theViewController = (CPDFPageViewController *)viewController;
 
     NSUInteger theNextPageNumber = theViewController.page.pageNumber + 1;
-    if (theNextPageNumber < 1 || theNextPageNumber > self.document.numberOfPages)
+    if (theNextPageNumber > self.document.numberOfPages)
         {
         return(NULL);
         }
 
-    CPDFPage *thePage = [self.document pageForPageNumber:theNextPageNumber];
+    CPDFPage *thePage = theNextPageNumber > 0 ? [self.document pageForPageNumber:theNextPageNumber] : NULL;
     theViewController = [self pageViewControllerWithPage:thePage];
 
     return(theViewController);
@@ -412,8 +419,10 @@
     [self populateCache];
 
     CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-
-    self.previewBar.selectedPreviewIndex = theFirstViewController.page.pageNumber - 1;
+    if (theFirstViewController.page)
+        {
+        self.previewBar.selectedPreviewIndex = theFirstViewController.page.pageNumber - 1;
+        }
     }
 
 - (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation
@@ -424,29 +433,30 @@
 	if (UIInterfaceOrientationIsPortrait(orientation) || self.document.numberOfPages == 1)
         {
 		theSpineLocation = UIPageViewControllerSpineLocationMin;
-
-		UIViewController *currentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-		theViewControllers = [NSArray arrayWithObject:currentViewController];
         self.pageViewController.doubleSided = NO;
+
+        CPDFPageViewController *theCurrentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
+        if (theCurrentViewController.page == NULL)
+            {
+            theViewControllers = [self pageViewControllersForRange:(NSRange){ 1, 1 }];
+            }
+        else
+            {
+            theViewControllers = [self pageViewControllersForRange:(NSRange){ theCurrentViewController.page.pageNumber, 1 }];
+            }
+
         }
     else
         {
         theSpineLocation = UIPageViewControllerSpineLocationMid;
-
-        CPDFPageViewController *currentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-
-        NSUInteger indexOfCurrentViewController = currentViewController.page.pageNumber - 1;
-        if (indexOfCurrentViewController == 0 || indexOfCurrentViewController % 2 == 0)
-            {
-            UIViewController *nextViewController = [self pageViewController:self.pageViewController viewControllerAfterViewController:currentViewController];
-            theViewControllers = [NSArray arrayWithObjects:currentViewController, nextViewController, nil];
-            }
-        else
-            {
-            UIViewController *previousViewController = [self pageViewController:self.pageViewController viewControllerBeforeViewController:currentViewController];
-            theViewControllers = [NSArray arrayWithObjects:previousViewController, currentViewController, nil];
-            }
         self.pageViewController.doubleSided = YES;
+
+        CPDFPageViewController *theCurrentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
+        NSUInteger theCurrentPageNumber = theCurrentViewController.page.pageNumber;
+
+        theCurrentPageNumber = theCurrentPageNumber / 2 * 2;
+
+        theViewControllers = [self pageViewControllersForRange:(NSRange){ theCurrentPageNumber, 2 }];
         }
 
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];

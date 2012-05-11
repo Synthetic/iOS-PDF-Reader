@@ -79,6 +79,8 @@
     {
     if (_page == NULL)
         {
+        NSLog(@"FOO: %@", [UIImage imageNamed:@"EmptyPage.png"]);
+        [[UIImage imageNamed:@"EmptyPage.png"] drawInRect:self.bounds];
         return;
         }
 
@@ -95,7 +97,6 @@
 
     CGContextSetFillColorWithColor(theContext, [UIColor whiteColor].CGColor);
     CGContextFillRect(theContext, theMediaBox);
-
 
     UIImage *theCachedImage = [self.renderedPageCache objectForKey:[NSString stringWithFormat:@"%d[%d,%d]", self.page.pageNumber, (int)self.bounds.size.width, (int)self.bounds.size.height]];
     if (theCachedImage != NULL)
