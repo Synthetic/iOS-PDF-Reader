@@ -421,7 +421,17 @@
     CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
     if (theFirstViewController.page)
         {
-        self.previewBar.selectedPreviewIndexes = [NSIndexSet indexSetWithIndex:theFirstViewController.page.pageNumber - 1];
+        NSArray *thePageNumbers = [self.pageViewController.viewControllers valueForKey:@"pageNumber"];
+        NSMutableIndexSet *theIndexSet = [NSMutableIndexSet indexSet];
+        for (NSNumber *thePageNumber in thePageNumbers)
+            {
+            int N = [thePageNumber integerValue] - 1;
+            if (N != 0)
+                {
+                [theIndexSet addIndex:N];
+                }
+            }
+        self.previewBar.selectedPreviewIndexes = theIndexSet;
         }
     }
 

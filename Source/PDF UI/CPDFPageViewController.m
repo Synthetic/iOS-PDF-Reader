@@ -55,6 +55,18 @@
     return(YES);
     }
 
+- (NSUInteger)pageNumber
+    {
+    if (self.page == NULL)
+        {
+        return(0);
+        }
+    else
+        {
+        return(self.page.pageNumber);
+        }
+    }
+
 - (CPDFPageView *)pageView
     {
     if (_pageView == NULL)
