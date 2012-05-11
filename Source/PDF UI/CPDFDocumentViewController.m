@@ -427,6 +427,7 @@
 
 		UIViewController *currentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
 		theViewControllers = [NSArray arrayWithObject:currentViewController];
+        self.pageViewController.doubleSided = NO;
         }
     else
         {
@@ -445,6 +446,7 @@
             UIViewController *previousViewController = [self pageViewController:self.pageViewController viewControllerBeforeViewController:currentViewController];
             theViewControllers = [NSArray arrayWithObjects:previousViewController, currentViewController, nil];
             }
+        self.pageViewController.doubleSided = YES;
         }
 
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
