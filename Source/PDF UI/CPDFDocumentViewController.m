@@ -43,6 +43,7 @@
 
 @synthesize document = _document;
 @synthesize backgroundView = _backgroundView;
+@synthesize magazineMode = _magazineMode;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument
     {

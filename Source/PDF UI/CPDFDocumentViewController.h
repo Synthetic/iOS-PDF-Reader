@@ -20,6 +20,7 @@
 @property (readonly, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readonly, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, strong) UIView *backgroundView;
+@property (readwrite, nonatomic, assign) BOOL magazineMode;
 
 - (id)initWithURL:(NSURL *)inURL;
 
