@@ -337,7 +337,7 @@
 
 - (IBAction)gotoPage:(id)sender
     {
-    NSUInteger thePageNumber = self.previewBar.selectedPreviewIndex + 1;
+    NSUInteger thePageNumber = [self.previewBar.selectedPreviewIndexes firstIndex] + 1;
 
     [self openPage:[self.document pageForPageNumber:thePageNumber]];
     }
@@ -421,7 +421,7 @@
     CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
     if (theFirstViewController.page)
         {
-        self.previewBar.selectedPreviewIndex = theFirstViewController.page.pageNumber - 1;
+        self.previewBar.selectedPreviewIndexes = [NSIndexSet indexSetWithIndex:theFirstViewController.page.pageNumber - 1];
         }
     }
 

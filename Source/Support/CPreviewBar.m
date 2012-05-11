@@ -19,7 +19,7 @@
 @implementation CPreviewBar
 
 @synthesize highlightColor = _highlightColor;
-@synthesize selectedPreviewIndex = _selectedPreviewIndex;
+@synthesize selectedPreviewIndexes = _selectedPreviewIndexes;
 @synthesize previewSize = _previewSize;
 @synthesize previewGap = _previewGap;
 @synthesize placeholderImage = _placeholderImage;
@@ -66,17 +66,24 @@
     [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)]];
     }
 
-- (void)setSelectedPreviewIndex:(NSUInteger)inSelectedPreviewIndex
+- (void)setSelectedPreviewIndexes:(NSIndexSet *)inIndexSet
     {
-    if (_selectedPreviewIndex != inSelectedPreviewIndex)
+    if (_selectedPreviewIndexes != inIndexSet)
         {
-        CALayer *theLayer = [self.layer.sublayers objectAtIndex:_selectedPreviewIndex];
-        theLayer.borderWidth = 0.0;
 
-        _selectedPreviewIndex = inSelectedPreviewIndex;
-        theLayer = [self.layer.sublayers objectAtIndex:_selectedPreviewIndex];
-        theLayer.borderColor = self.highlightColor.CGColor;
-        theLayer.borderWidth = 5.0;
+        [_selectedPreviewIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+            CALayer *theLayer = [self.layer.sublayers objectAtIndex:idx];
+            theLayer.borderWidth = 0.0;
+            }];
+
+
+        _selectedPreviewIndexes = inIndexSet;
+
+        [_selectedPreviewIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+            CALayer *theLayer = [self.layer.sublayers objectAtIndex:idx];
+            theLayer.borderColor = self.highlightColor.CGColor;
+            theLayer.borderWidth = 5.0;
+            }];
         }
     }
 
@@ -131,7 +138,7 @@
     CGPoint theLocation = [inSender locationInView:self];
     CALayer *theLayer = [self.layer hitTest:theLocation];
     NSUInteger thePreviewIndex = [[theLayer valueForKey:@"previewIndex"] unsignedIntegerValue];
-    self.selectedPreviewIndex = thePreviewIndex;
+    self.selectedPreviewIndexes = [NSIndexSet indexSetWithIndex:thePreviewIndex];
     [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 

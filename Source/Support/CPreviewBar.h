@@ -12,7 +12,7 @@
 
 @interface CPreviewBar : UIControl
 
-@property (readwrite, nonatomic, assign) NSUInteger selectedPreviewIndex;
+@property (readwrite, nonatomic, strong) NSIndexSet *selectedPreviewIndexes;
 
 @property (readwrite, nonatomic, strong) UIColor *highlightColor;
 @property (readwrite, nonatomic, assign) CGSize previewSize;
