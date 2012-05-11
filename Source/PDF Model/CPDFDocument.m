@@ -207,7 +207,7 @@
             NSString *theKey = [NSString stringWithFormat:@"page_%zd_image_128x128", thePageNumber];
             if ([self.cache objectForKey:theKey] == NULL)
                 {
-                UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 }];
+                UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 } scale:[UIScreen mainScreen].scale];
                 [self.cache setObject:theImage forKey:theKey];
                 }
 

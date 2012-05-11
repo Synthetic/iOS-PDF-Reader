@@ -21,7 +21,7 @@
 - (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
 
 - (UIImage *)image;
-- (UIImage *)imageWithSize:(CGSize)inSize;
+- (UIImage *)imageWithSize:(CGSize)inSize scale:(CGFloat)inScale;
 
 - (UIImage *)thumbnail;
 

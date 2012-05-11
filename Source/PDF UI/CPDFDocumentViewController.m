@@ -347,8 +347,8 @@
         NSString *theKey = [NSString stringWithFormat:@"%d[%d,%d]", thePageNumber, (int)theBounds.size.width, (int)theBounds.size.height];
         if ([self.renderedPageCache objectForKey:theKey] == NULL)
             {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-                UIImage *theImage = [[self.document pageForPageNumber:thePageNumber] imageWithSize:theBounds.size];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                UIImage *theImage = [[self.document pageForPageNumber:thePageNumber] imageWithSize:theBounds.size scale:[UIScreen mainScreen].scale];
                 [self.renderedPageCache setObject:theImage forKey:theKey];
                 });
             }

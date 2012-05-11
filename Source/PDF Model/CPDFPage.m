@@ -91,9 +91,9 @@
     return(theImage);
     }
 
-- (UIImage *)imageWithSize:(CGSize)inSize
+- (UIImage *)imageWithSize:(CGSize)inSize scale:(CGFloat)inScale
     {
-    UIGraphicsBeginImageContext(inSize);
+    UIGraphicsBeginImageContextWithOptions(inSize, NO, inScale);
 
     CGContextRef theContext = UIGraphicsGetCurrentContext();
 
