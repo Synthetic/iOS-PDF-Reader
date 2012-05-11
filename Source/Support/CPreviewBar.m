@@ -52,10 +52,10 @@
     self.previewSize = (CGSize){ self.frame.size.height, self.frame.size.height };
     self.previewGap = 4.0;
 
-    UIGraphicsBeginImageContextWithOptions(self.previewSize, YES, 1.0);
+    UIGraphicsBeginImageContextWithOptions(self.previewSize, NO, 1.0);
 
     CGContextRef theContext = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(theContext, [UIColor redColor].CGColor);
+    CGContextSetFillColorWithColor(theContext, [UIColor clearColor].CGColor);
     CGContextFillRect(theContext, (CGRect){ .size = self.previewSize });
 
     self.placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -108,7 +108,7 @@
         theLayer.position = (CGPoint){ .x = N * (self.previewSize.width + self.previewGap), .y = 0 };
 //        theLayer.borderColor = [UIColor greenColor].CGColor;
 //        theLayer.borderWidth = 1.0;
-        theLayer.backgroundColor = [UIColor whiteColor].CGColor;
+//        theLayer.backgroundColor = [UIColor whiteColor].CGColor;
         theLayer.anchorPoint = CGPointZero;
         [theLayer setValue:[NSNumber numberWithUnsignedInteger:N] forKey:@"previewIndex"];
 
