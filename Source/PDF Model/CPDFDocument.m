@@ -17,7 +17,6 @@
 @property (readwrite, nonatomic, assign) dispatch_queue_t queue;
 @property (readwrite, nonatomic, strong) NSDictionary *pageNumbersByName;
 
-- (void)startGeneratingThumbnails;
 @end
 
 #pragma mark -
@@ -39,7 +38,7 @@
 
         _cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)inURL);
 
-        [self startGeneratingThumbnails];
+//        [self startGeneratingThumbnails];
 		}
 	return(self);
 	}
@@ -191,12 +190,14 @@
 
 - (void)startGeneratingThumbnails
     {
+    NSLog(@"START GENERATING THUMBNAILS");
+
     const size_t theNumberOfPages = CGPDFDocumentGetNumberOfPages(self.cg);
 
     // TODO - what if there are multiple queues.
     self.queue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^(void) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
 
         dispatch_apply(theNumberOfPages, self.queue, ^(size_t inIndex) {
 

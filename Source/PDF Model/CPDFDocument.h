@@ -25,6 +25,8 @@
 
 - (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber;
 - (CPDFPage *)pageForPageName:(NSString *)inPageName;
+
+- (void)startGeneratingThumbnails;
 @end
 
 #pragma mark -
