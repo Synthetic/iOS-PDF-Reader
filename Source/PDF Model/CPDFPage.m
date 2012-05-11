@@ -102,6 +102,8 @@
 	// First fill the background with white.
 	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
 
+    CGContextFillRect(theContext, (CGRect){ .size = inSize });
+
     const CGRect theMediaBox = self.mediaBox;
     const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, (CGRect){ .size = inSize }, ImageScaling_Proportionally, ImageAlignment_Center);
 
