@@ -323,8 +323,11 @@
         }
     NSArray *theViewControllers = [self pageViewControllersForRange:theRange];
 
-    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
+    UIPageViewControllerNavigationDirection theDirection = inPage.pageNumber > theCurrentPageViewController.pageNumber ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
+
+    [self.pageViewController setViewControllers:theViewControllers direction:theDirection animated:YES completion:NULL];
     [self updateTitle];
+    
     [self populateCache];
 
     return(YES);
