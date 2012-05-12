@@ -341,8 +341,10 @@
 - (IBAction)gotoPage:(id)sender
     {
     NSUInteger thePageNumber = [self.previewBar.selectedPreviewIndexes firstIndex] + 1;
-
-    thePageNumber = thePageNumber / 2 * 2;
+    if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation))
+        {
+        thePageNumber = thePageNumber / 2 * 2;
+        }
 
     NSUInteger theLength = UIInterfaceOrientationIsPortrait(self.interfaceOrientation) ? 1 : 2;
     self.previewBar.selectedPreviewIndexes = [NSIndexSet indexSetWithIndexesInRange:(NSRange){ .location = thePageNumber - 1, .length = theLength }];
