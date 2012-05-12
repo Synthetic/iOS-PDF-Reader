@@ -99,15 +99,14 @@
 
 	CGContextSaveGState(theContext);
 
-	// First fill the background with white.
-	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-
-    CGContextFillRect(theContext, (CGRect){ .size = inSize });
-
     const CGRect theMediaBox = self.mediaBox;
     const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, (CGRect){ .size = inSize }, ImageScaling_Proportionally, ImageAlignment_Center);
 
-	// Flip the context so that the PDF page is rendered right side up.
+    // Fill just the render rect with white.
+    CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
+    CGContextFillRect(theContext, theRenderRect);
+
+    // Flip the context so that the PDF page is rendered right side up.
 	CGContextTranslateCTM(theContext, 0.0, inSize.height);
 	CGContextScaleCTM(theContext, 1.0, -1.0);
 

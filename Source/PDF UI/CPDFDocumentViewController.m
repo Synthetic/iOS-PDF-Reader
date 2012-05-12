@@ -125,19 +125,27 @@
     CGRect theFrame = (CGRect){
         .origin = {
             .x = CGRectGetMinX(self.view.bounds),
-            .y = CGRectGetMaxY(self.view.bounds) - 64,
+            .y = CGRectGetMaxY(self.view.bounds) - 74,
             },
         .size = {
             .width = CGRectGetWidth(self.view.bounds),
-            .height = 64,
+            .height = 74,
             },
         };
 
     self.previewScrollView = [[CContentScrollView alloc] initWithFrame:theFrame];
     self.previewScrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    self.previewScrollView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.5];
+    self.previewScrollView.contentInset = UIEdgeInsetsMake(5.0f, 0.0f, 5.0f, 0.0f);
     [self.view addSubview:self.previewScrollView];
 
-    self.previewBar = [[CPreviewBar alloc] initWithFrame:(CGRect){ .size = self.previewScrollView.bounds.size } ];
+    CGRect contentFrame = (CGRect){
+        .size = {
+            .width = theFrame.size.width,
+            .height = 64,
+            },
+    };
+    self.previewBar = [[CPreviewBar alloc] initWithFrame:contentFrame];
     [self.previewBar addTarget:self action:@selector(gotoPage:) forControlEvents:UIControlEventValueChanged];
     self.previewBar.delegate = self;
     [self.previewBar sizeToFit];
@@ -178,7 +186,7 @@
     {
     [super viewDidAppear:animated];
 
-    [self performSelector:@selector(hideChrome) withObject:NULL afterDelay:2.0];
+    [self performSelector:@selector(hideChrome) withObject:NULL afterDelay:0.5];
     }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -200,12 +208,15 @@
 
 - (void)hideChrome
     {
-    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
-        self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
-        self.previewScrollView.alpha = (1.0 - !self.chromeHidden);
-        } completion:^(BOOL finished) {
-        self.chromeHidden = YES;
-        }];
+        if (self.chromeHidden == NO)
+            {
+            [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
+                self.navigationController.navigationBar.alpha = 0.0;
+                self.previewScrollView.alpha = 0.0;
+                } completion:^(BOOL finished) {
+                self.chromeHidden = YES;
+                }];
+            }
     }
 
 - (void)toggleChrome
@@ -266,6 +277,22 @@
     theFrame = CGRectIntegral(theFrame);
 
     self.pageViewController.view.frame = theFrame;
+    
+    // Show fancy shadow if PageViewController view is smaller than parent view
+    if (CGRectContainsRect(self.view.frame, self.pageViewController.view.frame) && CGRectEqualToRect(self.view.frame, self.pageViewController.view.frame) == NO)
+        {
+            CALayer *theLayer = self.pageViewController.view.layer;
+            theLayer.shadowPath = [[UIBezierPath bezierPathWithRect:self.pageViewController.view.bounds] CGPath];
+            theLayer.shadowRadius = 10.0f;
+            theLayer.shadowColor = [[UIColor blackColor] CGColor];
+            theLayer.shadowOpacity = 0.75f;
+            theLayer.shadowOffset = CGSizeZero;
+            theLayer.shouldRasterize = YES;
+        }
+    else
+        {
+            self.pageViewController.view.layer.shadowOpacity = 0.0f;
+        }
     }
 
 #pragma mark -
@@ -427,6 +454,7 @@
     {
     [self updateTitle];
     [self populateCache];
+    [self hideChrome];
 
     CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
     if (theFirstViewController.page)

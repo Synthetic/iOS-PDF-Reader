@@ -45,7 +45,6 @@
 
 - (void)setup
     {
-    self.layer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
 
     self.highlightColor = [UIColor redColor];
 
