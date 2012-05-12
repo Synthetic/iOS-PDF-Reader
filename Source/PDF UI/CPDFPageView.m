@@ -79,7 +79,6 @@
     {
     if (_page == NULL)
         {
-        NSLog(@"FOO: %@", [UIImage imageNamed:@"EmptyPage.png"]);
         [[UIImage imageNamed:@"EmptyPage.png"] drawInRect:self.bounds];
         return;
         }
