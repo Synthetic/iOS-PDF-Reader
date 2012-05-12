@@ -70,6 +70,7 @@
     {
     if (_selectedPreviewIndexes != inIndexSet)
         {
+        [CATransaction begin];
 
         [_selectedPreviewIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
             CALayer *theLayer = [self.layer.sublayers objectAtIndex:idx];
@@ -84,6 +85,8 @@
             theLayer.borderColor = self.highlightColor.CGColor;
             theLayer.borderWidth = 5.0;
             }];
+
+        [CATransaction commit];
         }
     }
 
