@@ -79,7 +79,7 @@
     {
     if (_page == NULL)
         {
-        [[UIImage imageNamed:@"EmptyPage.png"] drawInRect:self.bounds];
+        [[UIImage imageNamed:@"PagePlaceholder.png"] drawInRect:self.bounds];
         return;
         }
 
