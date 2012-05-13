@@ -287,7 +287,6 @@
             theLayer.shadowColor = [[UIColor blackColor] CGColor];
             theLayer.shadowOpacity = 0.75f;
             theLayer.shadowOffset = CGSizeZero;
-            theLayer.shouldRasterize = YES;
         }
     else
         {
@@ -392,7 +391,7 @@
     theStartPageNumber = MAX(theStartPageNumber - 1, 0);
     theLastPageNumber = MIN(theLastPageNumber + 1, self.document.numberOfPages);
 
-//    NSLog(@"(Potentially) Fetching: %d - %d", theStartPage, theLastPage);
+//    NSLog(@"(Potentially) Fetching: %d - %d", theStartPageNumber, theLastPageNumber);
 
     CGRect theBounds = [[self.pageViewController.viewControllers objectAtIndex:0] pageView].bounds;
 

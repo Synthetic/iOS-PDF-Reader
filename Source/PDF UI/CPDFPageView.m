@@ -89,7 +89,6 @@
 
     // First fill the background with white.
     CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-    CGContextSetFillColorWithColor(theContext, [[UIColor whiteColor] colorWithAlphaComponent:0.9].CGColor);
     CGContextFillRect(theContext, self.bounds);
 
     const CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self transform]));
