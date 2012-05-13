@@ -121,7 +121,7 @@
         NSString *theType = NULL;
         if ([self object:obj toData:&theData type:&theType error:NULL] == YES)
             {
-            NSString *theFilenameExtension = (__bridge NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)theType, kUTTagClassFilenameExtension);
+            NSString *theFilenameExtension = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)theType, kUTTagClassFilenameExtension);
             theDataURL = [theURL URLByAppendingPathExtension:theFilenameExtension];
             [theData writeToURL:theDataURL options:0 error:NULL];
             theWriteFlag = YES;
