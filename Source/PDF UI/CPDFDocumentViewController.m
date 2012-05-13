@@ -387,9 +387,15 @@
 
     NSInteger theStartPageNumber = [theStartPage pageNumber];
     NSInteger theLastPageNumber = [theLastPage pageNumber];
+        
+    NSInteger pageSpanToLoad = 1;
+    if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation))
+        {
+        pageSpanToLoad = 2;
+        }
 
-    theStartPageNumber = MAX(theStartPageNumber - 1, 0);
-    theLastPageNumber = MIN(theLastPageNumber + 1, self.document.numberOfPages);
+    theStartPageNumber = MAX(theStartPageNumber - pageSpanToLoad, 0);
+    theLastPageNumber = MIN(theLastPageNumber + pageSpanToLoad, self.document.numberOfPages);
 
 //    NSLog(@"(Potentially) Fetching: %d - %d", theStartPageNumber, theLastPageNumber);
 

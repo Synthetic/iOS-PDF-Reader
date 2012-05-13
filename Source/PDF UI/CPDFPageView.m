@@ -83,33 +83,25 @@
         return;
         }
 
-    CGContextRef theContext = UIGraphicsGetCurrentContext();
-
-    CGContextSaveGState(theContext);
-
-    // First fill the background with white.
-    CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-    CGContextFillRect(theContext, self.bounds);
-
-    const CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self transform]));
-
-    CGContextSetFillColorWithColor(theContext, [UIColor whiteColor].CGColor);
-    CGContextFillRect(theContext, theMediaBox);
-
-    UIImage *theCachedImage = [self.renderedPageCache objectForKey:[NSString stringWithFormat:@"%d[%d,%d]", self.page.pageNumber, (int)self.bounds.size.width, (int)self.bounds.size.height]];
-    if (theCachedImage != NULL)
+    NSString *cacheKey = [NSString stringWithFormat:@"%d[%d,%d]", self.page.pageNumber, (int)self.bounds.size.width, (int)self.bounds.size.height];
+    UIImage *theCachedImage = [self.renderedPageCache objectForKey:cacheKey];
+    if (theCachedImage == NULL)
         {
-        [theCachedImage drawInRect:self.bounds];
+//        NSLog(@"[Draw] Drawing page %i live...", _page.pageNumber);
+        theCachedImage = [self.page imageWithSize:self.bounds.size scale:[[UIScreen mainScreen] scale]];
+//        NSLog(@"[Draw] -> Page %i drawn...", _page.pageNumber);
+        [self.renderedPageCache setObject:theCachedImage forKey:cacheKey];
+//        NSLog(@"[Draw] --> Page %i cached.", _page.pageNumber);
         }
-    else
-        {
-        CGAffineTransform theTransform = [self transform];
-        CGContextConcatCTM(theContext, theTransform);
 
-        CGContextDrawPDFPage(theContext, self.page.cg);
-        }
+    [theCachedImage drawInRect:self.bounds];
 
 #if 0
+    CGContextRef theContext = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(theContext);
+    
+    CGContextConcatCTM(theContext, self.transform);
+
 	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFCropBox));
@@ -121,21 +113,19 @@
 	CGContextSetRGBStrokeColor(theContext, 0.0,0.0,0.0,1.0);
     CGContextSetLineWidth(theContext, 0.5);
     CGContextStrokeRect(theContext, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
-#endif
 
-#if 0
 	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
     for (CPDFAnnotation *theAnnotation in self.page.annotations)
         {
         CGContextStrokeRect(theContext, theAnnotation.frame);
         }
 
-#endif
-
     CGContextRestoreGState(theContext);
+#endif
+    
     }
 
-#pragma marl -
+#pragma mark -
 
 - (BOOL)isAnnotationInteractive:(CPDFAnnotation *)inAnnotation
     {
