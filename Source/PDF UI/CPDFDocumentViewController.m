@@ -372,7 +372,7 @@
         thePageNumber = thePageNumber / 2 * 2;
         }
 
-    NSUInteger theLength = UIInterfaceOrientationIsPortrait(self.interfaceOrientation) ? 1 : 2;
+    NSUInteger theLength = UIInterfaceOrientationIsPortrait(self.interfaceOrientation) ? 1 : ( thePageNumber < self.document.numberOfPages ? 2 : 1 );
     self.previewBar.selectedPreviewIndexes = [NSIndexSet indexSetWithIndexesInRange:(NSRange){ .location = thePageNumber - 1, .length = theLength }];
 
     [self openPage:[self.document pageForPageNumber:thePageNumber]];
