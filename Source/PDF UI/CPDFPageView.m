@@ -244,9 +244,16 @@
             NSString *thePageName = [theAnnotation.info objectForKey:@"D"];
 
             CPDFPage *thePage = [self.page.document pageForPageName:thePageName];
-            if ([self.delegate respondsToSelector:@selector(PDFPageView:openPage:)])
+            if (thePage == NULL)
                 {
-                [self.delegate PDFPageView:self openPage:thePage];
+                NSLog(@"Error: Cannot find page with name %@", thePageName);
+                }
+            else
+                {
+                if ([self.delegate respondsToSelector:@selector(PDFPageView:openPage:)])
+                    {
+                    [self.delegate PDFPageView:self openPage:thePage];
+                    }
                 }
             }
         else
