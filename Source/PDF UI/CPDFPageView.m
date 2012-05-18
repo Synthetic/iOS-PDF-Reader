@@ -122,7 +122,22 @@
 
     CGContextRestoreGState(theContext);
 #endif
+
+#if 0
+    CGContextRef theContext = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(theContext);
     
+    CGContextConcatCTM(theContext, self.transform);
+
+	CGContextSetRGBStrokeColor(theContext, 1.0,0.0,0.0,1.0);
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+        {
+        CGContextStrokeRect(theContext, theAnnotation.frame);
+        }
+
+    CGContextRestoreGState(theContext);
+#endif
+
     }
 
 #pragma mark -
