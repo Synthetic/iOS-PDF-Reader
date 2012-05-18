@@ -37,8 +37,6 @@
         _URL = inURL;
 
         _cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)inURL);
-
-//        [self startGeneratingThumbnails];
 		}
 	return(self);
 	}
@@ -133,52 +131,30 @@
             [thePagesByPageInfo setObject:thePage forKey:[NSNumber numberWithInt:(int)thePageInfo]];
             }
 
-
         NSMutableDictionary *thePageNumbersForPageNames = [NSMutableDictionary dictionary];
 
         CGPDFDictionaryRef theCatalog = CGPDFDocumentGetCatalog(self.cg);
 
         CGPDFObjectRef theObject = NULL;
 
-    //    CGPDFDictionaryGetObject(theCatalog, "Names", &theObject);
+        theObject = TXCGPDFDictionaryGetObjectForPath(theCatalog, @"Names.Dests.Names");
 
-        theObject = TXCGPDFDictionaryGetObjectForPath(theCatalog, @"Names.Dests.Kids");
-
-        CGPDFArrayRef theKidsArray = NULL;
-        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeArray, &theKidsArray);
-        size_t theKidsCount = CGPDFArrayGetCount(theKidsArray);
-        for (size_t N = 0; N != theKidsCount; ++N)
+        CGPDFArrayRef theNamesArray = NULL;
+        CGPDFObjectGetValue(theObject, kCGPDFObjectTypeArray, &theNamesArray);
+        size_t theNamesCount = CGPDFArrayGetCount(theNamesArray);
+        for (size_t N = 0; N != theNamesCount; N += 2)
             {
-            CGPDFDictionaryRef theDictionary = NULL;
-            if (CGPDFArrayGetDictionary(theKidsArray, N, &theDictionary) == NO)
-                {
-                NSLog(@"ERROR #1");
-                }
-            CGPDFArrayRef theNamesArray = NULL;
-            if (CGPDFDictionaryGetArray(theDictionary, "Names", &theNamesArray) == NO)
-                {
-                NSLog(@"ERROR #2");
-                }
-            size_t theNamesCount = CGPDFArrayGetCount(theNamesArray);
-            for (size_t N = 0; N != theNamesCount; N += 2)
-                {
-                NSString *thePageName = TXCGPDFArrayGetString(theNamesArray, N);
+            NSString *thePageName = TXCGPDFArrayGetString(theNamesArray, N);
 
-                CGPDFDictionaryRef theDictionary = NULL;
-                CGPDFArrayGetDictionary(theNamesArray, N + 1, &theDictionary);
+            CGPDFArrayRef thePageHolderArray = NULL;
+            CGPDFArrayGetArray(theNamesArray, N + 1, &thePageHolderArray);
 
-                CGPDFArrayRef theD = NULL;
-                CGPDFDictionaryGetArray(theDictionary, "D", &theD);
+            CGPDFDictionaryRef thePageDictionary = NULL;
+            CGPDFArrayGetDictionary(thePageHolderArray, 0, &thePageDictionary);
 
-                CGPDFDictionaryRef thePageDictionary = NULL;
-                CGPDFArrayGetDictionary(theD, 0, &thePageDictionary);
+            CPDFPage *thePage = [thePagesByPageInfo objectForKey:[NSNumber numberWithInt:(int)thePageDictionary]];
 
-
-
-                CPDFPage *thePage = [thePagesByPageInfo objectForKey:[NSNumber numberWithInt:(int)thePageDictionary]];
-
-                [thePageNumbersForPageNames setObject:[NSNumber numberWithInt:thePage.pageNumber] forKey:thePageName];
-                }
+            [thePageNumbersForPageNames setObject:[NSNumber numberWithInt:thePage.pageNumber] forKey:thePageName];
             }
 
         _pageNumbersByName = [thePageNumbersForPageNames copy];
