@@ -115,8 +115,10 @@
 
     NSURL *theURL = [self.URLs objectAtIndex:indexPath.row];
 
-    CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:theURL];
-    cell.textLabel.text = theDocument.title.length > 0 ? theDocument.title : @"Untitled PDF";
+//    CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:theURL];
+    NSString *theTitle = [theURL lastPathComponent];
+//    cell.textLabel.text = theDocument.title.length > 0 ? theDocument.title : @"Untitled PDF";
+    cell.textLabel.text = theTitle;
 
     // Configure the cell...
 
