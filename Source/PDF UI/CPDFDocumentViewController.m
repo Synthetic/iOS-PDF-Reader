@@ -408,7 +408,10 @@
             {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 UIImage *theImage = [[self.document pageForPageNumber:thePageNumber] imageWithSize:theBounds.size scale:[UIScreen mainScreen].scale];
-                [self.renderedPageCache setObject:theImage forKey:theKey];
+                if (theImage != NULL)
+                    {
+                    [self.renderedPageCache setObject:theImage forKey:theKey];
+                    }
                 });
             }
         }
