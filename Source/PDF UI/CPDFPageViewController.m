@@ -43,13 +43,6 @@
     self.view = self.pageView;
     }
 
-- (void)viewDidUnload
-    {
-    [super viewDidUnload];
-
-    self.pageView = NULL;
-    }
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
     return(YES);
