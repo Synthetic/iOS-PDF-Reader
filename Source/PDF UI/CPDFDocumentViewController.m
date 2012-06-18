@@ -18,9 +18,10 @@
 #import "CContentScrollView.h"
 #import "Geometry.h"
 
-@interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate>
+@interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate, UIScrollViewDelegate>
 
 @property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
+@property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *scrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) BOOL chromeHidden;
@@ -36,6 +37,7 @@
 @implementation CPDFDocumentViewController
 
 @synthesize pageViewController = _pageViewController;
+@synthesize scrollView = _scrollView;
 @synthesize previewScrollView = _previewScrollView;
 @synthesize previewBar = _previewBar;
 @synthesize chromeHidden = _chromeHidden;
@@ -118,7 +120,16 @@
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
 
     [self addChildViewController:self.pageViewController];
-    [self.view insertSubview:self.pageViewController.view atIndex:0];
+
+    self.scrollView = [[CContentScrollView alloc] initWithFrame:self.pageViewController.view.bounds];
+    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.scrollView.contentView = self.pageViewController.view;
+    self.scrollView.maximumZoomScale = 10.0;
+    self.scrollView.delegate = self;
+    
+    [self.scrollView addSubview:self.scrollView.contentView];
+
+    [self.view insertSubview:self.scrollView atIndex:0];
 
     // #########################################################################
 
@@ -157,15 +168,6 @@
 
     UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
     [self.view addGestureRecognizer:theTapGestureRecognizer];
-    }
-
-- (void)viewDidUnload
-    {
-    [super viewDidUnload];
-    //
-    self.pageViewController = NULL;
-    self.previewScrollView = NULL;
-    self.previewBar = NULL;
     }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -545,5 +547,11 @@
     [self openPage:inPage];
     return(YES);
     }
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView;     // return a view that will be scaled. if delegate returns nil, nothing happens
+    {
+    return(self.pageViewController.view);
+    }
+
 
 @end

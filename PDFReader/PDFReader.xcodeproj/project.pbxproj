@@ -44,6 +44,7 @@
 		45D9699B1552F8F600338688 /* CPDFAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D9699A1552F8F600338688 /* CPDFAnnotation.m */; };
 		45D969A01553058E00338688 /* CPDFPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D9699E1553058E00338688 /* CPDFPageViewController.m */; };
 		45D969CD1553177800338688 /* CPDFAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D969CC1553177800338688 /* CPDFAnnotationView.m */; };
+		45F9FAFA1582D495004D267B /* CFadelessTiledLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 45F9FAF91582D495004D267B /* CFadelessTiledLayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +117,8 @@
 		45D9699E1553058E00338688 /* CPDFPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPDFPageViewController.m; sourceTree = "<group>"; };
 		45D969CB1553177800338688 /* CPDFAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPDFAnnotationView.h; sourceTree = "<group>"; };
 		45D969CC1553177800338688 /* CPDFAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPDFAnnotationView.m; sourceTree = "<group>"; };
+		45F9FAF81582D495004D267B /* CFadelessTiledLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CFadelessTiledLayer.h; sourceTree = "<group>"; };
+		45F9FAF91582D495004D267B /* CFadelessTiledLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CFadelessTiledLayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,6 +315,8 @@
 				455699F4155071A5009E52FE /* NSFileManager_BugFixExtensions.m */,
 				45454DEF1558429B004AC470 /* CContentScrollView.h */,
 				45454DF01558429B004AC470 /* CContentScrollView.m */,
+				45F9FAF81582D495004D267B /* CFadelessTiledLayer.h */,
+				45F9FAF91582D495004D267B /* CFadelessTiledLayer.m */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -446,6 +451,7 @@
 				45C25DD9155335BD001BA233 /* PDFUtilities.m in Sources */,
 				453B5AD4155339FA0021607B /* CPDFObjectReference.m in Sources */,
 				45454DF11558429C004AC470 /* CContentScrollView.m in Sources */,
+				45F9FAFA1582D495004D267B /* CFadelessTiledLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -546,6 +552,7 @@
 				INSTALL_PATH = "$(LOCAL_APPS_DIR)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -563,6 +570,7 @@
 				INSTALL_PATH = "$(LOCAL_APPS_DIR)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
