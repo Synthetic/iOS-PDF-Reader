@@ -99,7 +99,7 @@
     {
     CGContextSaveGState(context);
 
-    CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self PDFTransform]));
+//    CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self PDFTransform]));
 //    NSLog(@"BEFORE: %@", NSStringFromCGRect(theMediaBox));
 //    theMediaBox.origin.x = floorf(theMediaBox.origin.x);
 //    theMediaBox.origin.y = floorf(theMediaBox.origin.y);
