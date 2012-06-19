@@ -14,11 +14,15 @@
 
 @interface CPDFPageViewController ()
 @property (readwrite, nonatomic, strong) CPDFPage *page;
+@property (readwrite, nonatomic, strong) IBOutlet UIImageView *previewView;
+@property (readwrite, nonatomic, strong) IBOutlet UIImageView *placeholderView;
 @property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @end
 
 @implementation CPDFPageViewController
 
+@synthesize previewView = _previewView;
+@synthesize placeholderView = _placeholderView;
 @synthesize pageView = _pageView;
 @synthesize page = _page;
 
@@ -40,7 +44,24 @@
 
 - (void)loadView
     {
-    self.view = self.pageView;
+    [super loadView];
+
+    if (self.page != NULL)
+        {
+        self.previewView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+        self.previewView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.previewView.image = self.page.preview;
+        [self.view addSubview:self.previewView];
+
+        [self.view addSubview:self.pageView];
+        }
+    else
+        {
+        self.placeholderView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+        self.placeholderView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.placeholderView.image = [UIImage imageNamed:@"PagePlaceholder"];
+        [self.view addSubview:self.placeholderView];
+        }
     }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -64,7 +85,8 @@
     {
     if (_pageView == NULL)
         {
-        _pageView = [[CPDFPageView alloc] init];
+        _pageView = [[CPDFPageView alloc] initWithFrame:self.view.bounds];
+        _pageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         }
     return(_pageView);
     }

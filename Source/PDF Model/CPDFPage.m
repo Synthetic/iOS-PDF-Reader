@@ -93,6 +93,8 @@
 
 - (UIImage *)imageWithSize:(CGSize)inSize scale:(CGFloat)inScale
     {
+    NSParameterAssert(inSize.width > 0 && inSize.height > 0);
+
     UIGraphicsBeginImageContextWithOptions(inSize, NO, inScale);
 
     CGContextRef theContext = UIGraphicsGetCurrentContext();
@@ -127,6 +129,22 @@
     {
     NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
     UIImage *theImage = [self.document.cache objectForKey:theKey];
+    return(theImage);
+    }
+
+- (UIImage *)preview
+    {
+    NSString *theKey = [NSString stringWithFormat:@"page_%d_image_preview2", self.pageNumber];
+    UIImage *theImage = [self.document.cache objectForKey:theKey];
+    if (theImage == NULL)
+        {
+        CGSize theSize = self.mediaBox.size;
+        theSize.width *= 0.5;
+        theSize.height *= 0.5;
+
+        theImage = [self imageWithSize:theSize scale:[UIScreen mainScreen].scale];
+        [self.document.cache setObject:theImage forKey:theKey];
+        }
     return(theImage);
     }
 

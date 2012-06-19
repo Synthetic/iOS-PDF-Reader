@@ -184,8 +184,25 @@
             NSString *theKey = [NSString stringWithFormat:@"page_%zd_image_128x128", thePageNumber];
             if ([self.cache objectForKey:theKey] == NULL)
                 {
-                UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 } scale:[UIScreen mainScreen].scale];
-                [self.cache setObject:theImage forKey:theKey];
+                @autoreleasepool
+                    {
+                    UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 } scale:[UIScreen mainScreen].scale];
+                    [self.cache setObject:theImage forKey:theKey];
+                    }
+                }
+
+            theKey = [NSString stringWithFormat:@"page_%zd_image_preview2", thePageNumber];
+            if ([self.cache objectForKey:theKey] == NULL)
+                {
+                @autoreleasepool
+                    {
+                    CGSize theSize = thePage.mediaBox.size;
+                    theSize.width *= 0.5;
+                    theSize.height *= 0.5;
+
+                    UIImage *theImage = [thePage imageWithSize:theSize scale:[UIScreen mainScreen].scale];
+                    [self.cache setObject:theImage forKey:theKey];
+                    }
                 }
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {

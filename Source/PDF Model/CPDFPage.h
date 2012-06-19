@@ -24,5 +24,6 @@
 - (UIImage *)imageWithSize:(CGSize)inSize scale:(CGFloat)inScale;
 
 - (UIImage *)thumbnail;
+- (UIImage *)preview;
 
 @end

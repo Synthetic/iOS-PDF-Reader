@@ -18,7 +18,7 @@
 #import "CFadelessTiledLayer.h"
 
 @interface CPDFPageView () <UIGestureRecognizerDelegate>
-- (CGAffineTransform)transform;
+- (CGAffineTransform)PDFTransform;
 - (void)addAnnotationViews;
 @end
 
@@ -32,7 +32,7 @@
 
 +(Class)layerClass
     {
-    return([CFadelessTiledLayer class]);
+    return([CATiledLayer class]);
     }
 
 - (id)initWithCoder:(NSCoder *)inCoder
@@ -41,14 +41,12 @@
         {
         self.contentMode = UIViewContentModeRedraw;
 
+        self.backgroundColor = [UIColor blackColor];
+        self.opaque = YES;
+
         CATiledLayer *tempTiledLayer = (CATiledLayer *)self.layer;
         tempTiledLayer.levelsOfDetail = 5;
         tempTiledLayer.levelsOfDetailBias = 2;
-        self.opaque=YES;
-
-
-//        self.layer.borderColor = [UIColor purpleColor].CGColor;
-//        self.layer.borderWidth = 2.0;
 
         UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
         theTapGestureRecognizer.delegate = self;
@@ -65,14 +63,12 @@
         {
         self.contentMode = UIViewContentModeRedraw;
 
+        self.backgroundColor = [UIColor blackColor];
+        self.opaque = YES;
+
         CATiledLayer *tempTiledLayer = (CATiledLayer *)self.layer;
         tempTiledLayer.levelsOfDetail = 5;
         tempTiledLayer.levelsOfDetailBias = 2;
-        self.opaque=YES;
-
-
-//        self.layer.borderColor = [UIColor purpleColor].CGColor;
-//        self.layer.borderWidth = 2.0;
 
         UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
         theTapGestureRecognizer.delegate = self;
@@ -103,21 +99,24 @@
     {
     CGContextSaveGState(context);
 
-    // First fill the background with white.
-    CGContextSetRGBFillColor(context, 1.0,1.0,1.0,1.0);
-    CGContextFillRect(context, self.bounds);
-
-    const CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self transform]));
+    CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self PDFTransform]));
+//    NSLog(@"BEFORE: %@", NSStringFromCGRect(theMediaBox));
+//    theMediaBox.origin.x = floorf(theMediaBox.origin.x);
+//    theMediaBox.origin.y = floorf(theMediaBox.origin.y);
+//    theMediaBox.size.width = ceilf(theMediaBox.size.width);
+//    theMediaBox.size.height = ceilf(theMediaBox.size.height);
+//
+//    NSLog(@"AFTER: %@", NSStringFromCGRect(theMediaBox));
 
     CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
-    CGContextFillRect(context, theMediaBox);
+    CGContextFillRect(context, self.bounds);
 
-    CGAffineTransform theTransform = [self transform];
+    CGAffineTransform theTransform = [self PDFTransform];
     CGContextConcatCTM(context, theTransform);
 
     CGContextDrawPDFPage(context, self.page.cg);
 
-#if 1
+#if 0
 	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
     CGContextSetLineWidth(context, 0.5);
     CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFCropBox));
@@ -131,7 +130,7 @@
     CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
 #endif
 
-#if 1
+#if 0
 	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
     for (CPDFAnnotation *theAnnotation in self.page.annotations)
         {
@@ -162,7 +161,7 @@
 
 - (CPDFAnnotation *)annotationForPoint:(CGPoint)inPoint
     {
-    CGAffineTransform theTransform = CGAffineTransformInvert([self transform]);
+    CGAffineTransform theTransform = CGAffineTransformInvert([self PDFTransform]);
 
     inPoint = CGPointApplyAffineTransform(inPoint, theTransform);
 
@@ -184,14 +183,15 @@
     for (CPDFAnnotationView *theAnnotationView in self.subviews)
         {
         CPDFAnnotation *theAnnotation = theAnnotationView.annotation;
-        theAnnotationView.frame = CGRectApplyAffineTransform(theAnnotation.frame, [self transform]);
+        theAnnotationView.frame = CGRectApplyAffineTransform(theAnnotation.frame, [self PDFTransform]);
         }
     }
 
-- (CGAffineTransform)transform
+- (CGAffineTransform)PDFTransform
     {
     const CGRect theMediaBox = self.page.mediaBox;
-    const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+    CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, self.bounds, ImageScaling_Proportionally, ImageAlignment_Center);
+    theRenderRect = CGRectIntegral(theRenderRect);
     CGAffineTransform theTransform = CGAffineTransformMakeTranslation(0, self.bounds.size.height);
     theTransform = CGAffineTransformScale(theTransform, 1.0, -1.0);
     theTransform = CGAffineTransformTranslate(theTransform, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));

@@ -124,7 +124,7 @@
     self.scrollView = [[CContentScrollView alloc] initWithFrame:self.pageViewController.view.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.contentView = self.pageViewController.view;
-    self.scrollView.maximumZoomScale = 10.0;
+    self.scrollView.maximumZoomScale = 4.0;
     self.scrollView.delegate = self;
     
     [self.scrollView addSubview:self.scrollView.contentView];
@@ -166,8 +166,12 @@
 
     // #########################################################################
 
-    UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self.view addGestureRecognizer:theTapGestureRecognizer];
+    UITapGestureRecognizer *theSingleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self.view addGestureRecognizer:theSingleTapGestureRecognizer];
+
+    UITapGestureRecognizer *theDoubleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+    theDoubleTapGestureRecognizer.numberOfTapsRequired = 2;
+    [self.view addGestureRecognizer:theDoubleTapGestureRecognizer];
     }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -366,6 +370,21 @@
     [self toggleChrome];
     }
 
+- (void)doubleTap:(UITapGestureRecognizer *)inRecognizer
+    {
+    NSLog(@"DOUBLE TAP: %f", self.scrollView.zoomScale);
+    if (self.scrollView.zoomScale != 1.0)
+        {
+        [self.scrollView setZoomScale:1.0 animated:YES];
+        }
+    else
+        {
+        [self.scrollView setZoomScale:1.66 animated:YES];
+        }
+
+
+    }
+
 - (IBAction)gotoPage:(id)sender
     {
     NSUInteger thePageNumber = [self.previewBar.selectedPreviewIndexes firstIndex] + 1;
@@ -401,7 +420,9 @@
 
 //    NSLog(@"(Potentially) Fetching: %d - %d", theStartPageNumber, theLastPageNumber);
 
-    CGRect theBounds = [[self.pageViewController.viewControllers objectAtIndex:0] pageView].bounds;
+    UIView *thePageView = [[self.pageViewController.viewControllers objectAtIndex:0] pageView];
+    NSParameterAssert(thePageView != NULL);
+    CGRect theBounds = thePageView.bounds;
 
     for (NSInteger thePageNumber = theStartPageNumber; thePageNumber <= theLastPageNumber; ++thePageNumber)
         {
