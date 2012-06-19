@@ -36,7 +36,7 @@
 	if ((self = [super init]) != NULL)
 		{
         _name = inName;
-        _cache = [[NSCache alloc] init];
+//        _cache = [[NSCache alloc] init];
 		}
 	return(self);
 	}
