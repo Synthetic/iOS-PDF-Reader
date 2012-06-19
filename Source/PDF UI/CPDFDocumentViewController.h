@@ -11,6 +11,7 @@
 @class CPDFDocument;
 @class CContentScrollView;
 @class CPreviewBar;
+@class CPDFPage;
 
 @interface CPDFDocumentViewController : UIViewController
 
@@ -21,7 +22,10 @@
 @property (readonly, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, strong) UIView *backgroundView;
 @property (readwrite, nonatomic, assign) BOOL magazineMode;
+@property (readonly, nonatomic, strong) NSArray *pages;
 
 - (id)initWithURL:(NSURL *)inURL;
+
+- (BOOL)openPage:(CPDFPage *)inPage;
 
 @end
