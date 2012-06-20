@@ -172,6 +172,8 @@
     UITapGestureRecognizer *theDoubleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
     theDoubleTapGestureRecognizer.numberOfTapsRequired = 2;
     [self.view addGestureRecognizer:theDoubleTapGestureRecognizer];
+
+    [theSingleTapGestureRecognizer requireGestureRecognizerToFail:theDoubleTapGestureRecognizer];
     }
 
 - (void)viewWillAppear:(BOOL)animated
