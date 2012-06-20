@@ -424,7 +424,11 @@
 //    NSLog(@"(Potentially) Fetching: %d - %d", theStartPageNumber, theLastPageNumber);
 
     UIView *thePageView = [[self.pageViewController.viewControllers objectAtIndex:0] pageView];
-    NSParameterAssert(thePageView != NULL);
+    if (thePageView == NULL)
+        {
+        NSLog(@"WARNING: No page view.");
+        return;
+        }
     CGRect theBounds = thePageView.bounds;
 
     for (NSInteger thePageNumber = theStartPageNumber; thePageNumber <= theLastPageNumber; ++thePageNumber)
