@@ -14,9 +14,9 @@
 
 @interface CPDFPageViewController ()
 @property (readwrite, nonatomic, strong) CPDFPage *page;
+@property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *previewView;
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *placeholderView;
-@property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @end
 
 @implementation CPDFPageViewController
@@ -39,13 +39,6 @@
     {
     [super viewDidLoad];
     //
-    self.pageView.page = self.page;
-    }
-
-- (void)loadView
-    {
-    [super loadView];
-
     if (self.page != NULL)
         {
         self.previewView = [[UIImageView alloc] initWithFrame:self.view.bounds];
@@ -53,6 +46,9 @@
         self.previewView.image = self.page.preview;
         [self.view addSubview:self.previewView];
 
+        self.pageView = [[CPDFPageView alloc] initWithFrame:self.view.bounds];
+        self.pageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.pageView.page = self.page;
         [self.view addSubview:self.pageView];
         }
     else
@@ -79,16 +75,6 @@
         {
         return(self.page.pageNumber);
         }
-    }
-
-- (CPDFPageView *)pageView
-    {
-    if (_pageView == NULL)
-        {
-        _pageView = [[CPDFPageView alloc] initWithFrame:self.view.bounds];
-        _pageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        }
-    return(_pageView);
     }
 
 @end

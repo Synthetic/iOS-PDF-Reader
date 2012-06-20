@@ -29,7 +29,7 @@
 @protocol CPDFPageViewDelegate <NSObject>
 
 @optional
-- (BOOL)PDFPageView:(CPDFPageView *)inPageView openURL:(NSURL *)inURL;
-- (BOOL)PDFPageView:(CPDFPageView *)inPageView openPage:(CPDFPage *)inPage;
+- (BOOL)PDFPageView:(CPDFPageView *)inPageView openURL:(NSURL *)inURL fromRect:(CGRect)inFrame;
+- (BOOL)PDFPageView:(CPDFPageView *)inPageView openPage:(CPDFPage *)inPage fromRect:(CGRect)inFrame;
 
 @end

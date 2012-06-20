@@ -328,6 +328,9 @@
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
     {
     CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
+    // Force load the view.
+    [thePageViewController view];
+//    NSParameterAssert(thePageViewController.pageView != NULL);
     thePageViewController.pageView.delegate = self;
     thePageViewController.pageView.renderedPageCache = self.renderedPageCache;
     return(thePageViewController);
@@ -563,11 +566,13 @@
 
 #pragma mark -
 
-- (BOOL)PDFPageView:(CPDFPageView *)inPageView openPage:(CPDFPage *)inPage
+- (BOOL)PDFPageView:(CPDFPageView *)inPageView openPage:(CPDFPage *)inPage fromRect:(CGRect)inFrame
     {
     [self openPage:inPage];
     return(YES);
     }
+
+#pragma mark -
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView;     // return a view that will be scaled. if delegate returns nil, nothing happens
     {

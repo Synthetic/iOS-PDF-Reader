@@ -99,15 +99,6 @@
     {
     CGContextSaveGState(context);
 
-//    CGRect theMediaBox = CGRectApplyAffineTransform(self.page.mediaBox, CGAffineTransformInvert([self PDFTransform]));
-//    NSLog(@"BEFORE: %@", NSStringFromCGRect(theMediaBox));
-//    theMediaBox.origin.x = floorf(theMediaBox.origin.x);
-//    theMediaBox.origin.y = floorf(theMediaBox.origin.y);
-//    theMediaBox.size.width = ceilf(theMediaBox.size.width);
-//    theMediaBox.size.height = ceilf(theMediaBox.size.height);
-//
-//    NSLog(@"AFTER: %@", NSStringFromCGRect(theMediaBox));
-
     CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
     CGContextFillRect(context, self.bounds);
 
@@ -130,7 +121,7 @@
     CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
 #endif
 
-#if 0
+#if 1
 	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
     for (CPDFAnnotation *theAnnotation in self.page.annotations)
         {
@@ -228,9 +219,11 @@
                 {
                 NSURL *theURL = [NSURL URLWithString:theURLString];
 
-                if ([self.delegate respondsToSelector:@selector(PDFPageView:openURL:)])
+                if ([self.delegate respondsToSelector:@selector(PDFPageView:openURL:fromRect:)])
                     {
-                    [self.delegate PDFPageView:self openURL:theURL];
+                    CGRect theAnnotationFrame = theAnnotation.frame;
+                    theAnnotationFrame = CGRectApplyAffineTransform(theAnnotationFrame, self.PDFTransform);
+                    [self.delegate PDFPageView:self openURL:theURL fromRect:theAnnotationFrame];
                     }
                 else
                     {
@@ -252,9 +245,11 @@
                 }
             else
                 {
-                if ([self.delegate respondsToSelector:@selector(PDFPageView:openPage:)])
+                if ([self.delegate respondsToSelector:@selector(PDFPageView:openPage:fromRect:)])
                     {
-                    [self.delegate PDFPageView:self openPage:thePage];
+                    CGRect theAnnotationFrame = theAnnotation.frame;
+                    theAnnotationFrame = CGRectApplyAffineTransform(theAnnotationFrame, self.PDFTransform);
+                    [self.delegate PDFPageView:self openPage:thePage fromRect:theAnnotationFrame];
                     }
                 }
             }
