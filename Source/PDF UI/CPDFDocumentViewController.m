@@ -124,7 +124,7 @@
     self.scrollView = [[CContentScrollView alloc] initWithFrame:self.pageViewController.view.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.contentView = self.pageViewController.view;
-    self.scrollView.maximumZoomScale = 4.0;
+    self.scrollView.maximumZoomScale = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone ? 8.0 : 4.0;
     self.scrollView.delegate = self;
     
     [self.scrollView addSubview:self.scrollView.contentView];
@@ -377,17 +377,15 @@
 
 - (void)doubleTap:(UITapGestureRecognizer *)inRecognizer
     {
-    NSLog(@"DOUBLE TAP: %f", self.scrollView.zoomScale);
+//    NSLog(@"DOUBLE TAP: %f", self.scrollView.zoomScale);
     if (self.scrollView.zoomScale != 1.0)
         {
         [self.scrollView setZoomScale:1.0 animated:YES];
         }
     else
         {
-        [self.scrollView setZoomScale:1.66 animated:YES];
+        [self.scrollView setZoomScale:[UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone ? 2.6 : 1.66 animated:YES];
         }
-
-
     }
 
 - (IBAction)gotoPage:(id)sender
