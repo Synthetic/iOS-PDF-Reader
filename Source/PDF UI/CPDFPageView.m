@@ -121,7 +121,7 @@
     CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
 #endif
 
-#if 1
+#if 0
 	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
     for (CPDFAnnotation *theAnnotation in self.page.annotations)
         {
