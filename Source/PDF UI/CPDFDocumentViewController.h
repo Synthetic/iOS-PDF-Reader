@@ -46,6 +46,7 @@
 @property (readwrite, nonatomic, strong) UIView *backgroundView;
 @property (readwrite, nonatomic, assign) BOOL magazineMode;
 @property (readonly, nonatomic, strong) NSArray *pages;
+@property (readwrite, nonatomic, strong) UIImage *pagePlaceholderImage;
 
 - (id)initWithURL:(NSURL *)inURL;
 

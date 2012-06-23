@@ -38,7 +38,8 @@
 
 @property (readonly, nonatomic, assign) NSUInteger pageNumber;
 @property (readonly, nonatomic, strong) CPDFPage *page;
-@property (readonly, nonatomic, strong) IBOutlet CPDFPageView *pageView;
+@property (readonly, nonatomic, strong) CPDFPageView *pageView;
+@property (readwrite, nonatomic, strong) UIImage *pagePlaceholderImage;
 
 - (id)initWithPage:(CPDFPage *)inPage;
 

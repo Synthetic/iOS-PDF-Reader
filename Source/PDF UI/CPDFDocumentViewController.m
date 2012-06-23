@@ -69,6 +69,7 @@
 @synthesize document = _document;
 @synthesize backgroundView = _backgroundView;
 @synthesize magazineMode = _magazineMode;
+@synthesize pagePlaceholderImage = _pagePlaceholderImage;
 
 - (id)initWithDocument:(CPDFDocument *)inDocument
     {
@@ -353,6 +354,7 @@
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
     {
     CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
+    thePageViewController.pagePlaceholderImage = self.pagePlaceholderImage;
     // Force load the view.
     [thePageViewController view];
 //    NSParameterAssert(thePageViewController.pageView != NULL);

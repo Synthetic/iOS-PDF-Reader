@@ -42,12 +42,15 @@
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *placeholderView;
 @end
 
+#pragma mark -
+
 @implementation CPDFPageViewController
 
 @synthesize previewView = _previewView;
 @synthesize placeholderView = _placeholderView;
 @synthesize pageView = _pageView;
 @synthesize page = _page;
+@synthesize pagePlaceholderImage = _pagePlaceholderImage;
 
 - (id)initWithPage:(CPDFPage *)inPage;
     {
@@ -78,7 +81,7 @@
         {
         self.placeholderView = [[UIImageView alloc] initWithFrame:self.view.bounds];
         self.placeholderView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.placeholderView.image = [UIImage imageNamed:@"PagePlaceholder"];
+        self.placeholderView.image = self.pagePlaceholderImage;
         [self.view addSubview:self.placeholderView];
         }
     }
