@@ -221,4 +221,12 @@
     return(theResult);
     }
 
+- (void)destroyAllPersistedData
+{
+	NSError *theError = NULL;
+	if ([[NSFileManager defaultManager] removeItemAtURL:self.URL error:&theError] == NO) {
+		NSLog(@"Error destorying cache %@: %@", self.name, theError);
+	}
+}
+
 @end
