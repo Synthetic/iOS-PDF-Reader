@@ -18,3 +18,10 @@ See License.txt
 * (Re)Add Dropbox support
 * Better Library screen
 * Remember reading locations.
+
+## Contributing
+
+* File bugs/feature requests
+* Issue pull requests
+* Tip me on [gittip.com/schwa](https://www.gittip.com/schwa/)
+
