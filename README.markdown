@@ -13,15 +13,15 @@ See License.txt
 * Supports internal (page) and external links
 * Supports embedded and streaming videos
 
-## TODO
-
-* (Re)Add Dropbox support
-* Better Library screen
-* Remember reading locations.
-
 ## Contributing
 
 * File bugs/feature requests
 * Issue pull requests
 * Tip me on [gittip.com/schwa](https://www.gittip.com/schwa/)
+
+## TODO
+
+* (Re)Add Dropbox support
+* Better Library screen
+* Remember reading locations.
 
