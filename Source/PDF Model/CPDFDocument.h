@@ -50,6 +50,7 @@
 - (CPDFPage *)pageForPageName:(NSString *)inPageName;
 
 - (void)startGeneratingThumbnails;
+- (void)clearCachedThumbnails;
 @end
 
 #pragma mark -

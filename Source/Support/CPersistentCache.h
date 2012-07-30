@@ -45,4 +45,6 @@
 - (void)setObject:(id)obj forKey:(id)key cost:(NSUInteger)g;
 - (void)removeObjectForKey:(id)key;
 
+- (void)destroyAllPersistedData;
+
 @end
