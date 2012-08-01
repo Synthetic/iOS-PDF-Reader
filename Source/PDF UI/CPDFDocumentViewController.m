@@ -423,7 +423,7 @@
 
 //    NSLog(@"(Potentially) Fetching: %d - %d", theStartPageNumber, theLastPageNumber);
 
-    UIView *thePageView = [[self.pageViewController.viewControllers objectAtIndex:0] pageView];
+    UIView *thePageView = [[self.pageViewController.viewControllers lastObject] pageView];
     if (thePageView == NULL)
         {
         NSLog(@"WARNING: No page view.");
