@@ -31,9 +31,10 @@
 
 #import "CWebViewController.h"
 
-@interface CWebViewController ()
+@interface CWebViewController () <UIWebViewDelegate>
 @property (readwrite, nonatomic, strong) NSURL *URL;
 @property (readwrite, nonatomic, strong) UIWebView *webView;
+@property (readonly, nonatomic, strong) UIActivityIndicatorView *loadingIndicatorView;
 @end
 
 @implementation CWebViewController
@@ -48,6 +49,12 @@
         _URL = inURL;
 
         _webView = [[UIWebView alloc] initWithFrame:(CGRect){ .size = { 320, 320 } }];
+        _webView.delegate = self;
+        _loadingIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [_webView addSubview:_loadingIndicatorView];
+        _loadingIndicatorView.center = CGPointMake(_webView.frame.size.width/2, _webView.frame.size.height/2);
+        _loadingIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleBottomMargin|UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin;
+
         NSURLRequest *theRequest = [NSURLRequest requestWithURL:_URL];
         [_webView loadRequest:theRequest];
         }
@@ -67,6 +74,16 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
     return(YES);
+    }
+
+- (void)webViewDidStartLoad:(UIWebView *)webView
+    {
+    [_loadingIndicatorView startAnimating];
+    }
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+    {
+    [_loadingIndicatorView stopAnimating];
     }
 
 @end

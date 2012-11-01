@@ -47,6 +47,7 @@
 - (UIImage *)imageWithSize:(CGSize)inSize scale:(CGFloat)inScale;
 
 - (UIImage *)thumbnail;
+- (BOOL)thumbnailExists;
 - (UIImage *)preview;
 
 @end

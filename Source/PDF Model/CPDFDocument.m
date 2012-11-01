@@ -37,7 +37,6 @@
 #import "PDFUtilities.h"
 
 @interface CPDFDocument ()
-@property (readwrite, nonatomic, assign) dispatch_queue_t queue;
 @property (readwrite, nonatomic, strong) NSDictionary *pageNumbersByName;
 
 @end
@@ -50,7 +49,6 @@
 @synthesize cg = _cg;
 @synthesize delegate = _delegate;
 
-@synthesize queue = _queue;
 @synthesize pageNumbersByName = _pageNumbersByName;
 
 - (id)initWithURL:(NSURL *)inURL;
@@ -66,12 +64,6 @@
 
 - (void)dealloc
     {
-    if (_queue != NULL)
-        {
-        dispatch_release(_queue);
-        _queue = NULL;
-        }
-
     if (_cg)
         {
         CGPDFDocumentRelease(_cg);
@@ -193,39 +185,16 @@
 
     const size_t theNumberOfPages = CGPDFDocumentGetNumberOfPages(self.cg);
 
-    // TODO - what if there are multiple queues.
-    self.queue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
+        for (size_t thePageNumber = 1; thePageNumber < theNumberOfPages; thePageNumber++) {
 
-        dispatch_apply(theNumberOfPages, self.queue, ^(size_t inIndex) {
+			CPDFPage *thePage = [self pageForPageNumber:thePageNumber];
 
-            const size_t thePageNumber = inIndex + 1;
-
-            CPDFPage *thePage = [self pageForPageNumber:thePageNumber];
-
-            NSString *theKey = [NSString stringWithFormat:@"page_%zd_image_128x128", thePageNumber];
-            if ([self.cache objectForKey:theKey] == NULL)
+			@autoreleasepool
                 {
-                @autoreleasepool
-                    {
-                    UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 } scale:[UIScreen mainScreen].scale];
-                    [self.cache setObject:theImage forKey:theKey];
-                    }
-                }
-
-            theKey = [NSString stringWithFormat:@"page_%zd_image_preview2", thePageNumber];
-            if ([self.cache objectForKey:theKey] == NULL)
-                {
-                @autoreleasepool
-                    {
-                    CGSize theSize = thePage.mediaBox.size;
-                    theSize.width *= 0.5;
-                    theSize.height *= 0.5;
-
-                    UIImage *theImage = [thePage imageWithSize:theSize scale:[UIScreen mainScreen].scale];
-                    [self.cache setObject:theImage forKey:theKey];
-                    }
+                // Generate and cache thumbnail (if needed)
+                [thePage thumbnail];
                 }
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -234,7 +203,7 @@
                     [self.delegate PDFDocument:self didUpdateThumbnailForPage:thePage];
                     }
                 });
-            });
+            }
         });
     }
 

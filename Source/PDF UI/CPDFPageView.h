@@ -40,7 +40,6 @@
 @interface CPDFPageView : UIView
 
 @property (readwrite, nonatomic, strong) CPDFPage *page;
-@property (readwrite, nonatomic, strong) NSCache *renderedPageCache;
 @property (readwrite, nonatomic, assign) id <CPDFPageViewDelegate> delegate;
 
 - (CPDFAnnotation *)annotationForPoint:(CGPoint)inPoint;

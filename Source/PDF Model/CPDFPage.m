@@ -38,6 +38,8 @@
 #import "CPDFAnnotation.h"
 
 @interface CPDFPage ()
+@property (readwrite, nonatomic, assign) dispatch_queue_t renderPreviewQueue;
+@property (readwrite, nonatomic, assign) dispatch_queue_t renderThumbnailQueue;
 @end
 
 #pragma mark -
@@ -57,6 +59,8 @@
         _document = inDocument;
         _pageNumber = inPageNumber;
         _mediaBox = CGRectNull;
+        _renderPreviewQueue = dispatch_queue_create("com.toxicsoftware.pdf-preview-queue", NULL);
+        _renderThumbnailQueue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
 		}
 	return(self);
 	}
@@ -67,6 +71,8 @@
         {
         CGPDFPageRelease(_cg);
         _cg = NULL;
+        dispatch_release(_renderPreviewQueue);
+        dispatch_release(_renderThumbnailQueue);
         }
     }
 
@@ -150,24 +156,40 @@
 
 - (UIImage *)thumbnail
     {
-    NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
-    UIImage *theImage = [self.document.cache objectForKey:theKey];
+    __block UIImage *theImage = NULL;
+    dispatch_sync(_renderThumbnailQueue, ^{
+        NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
+        theImage = [self.document.cache objectForKey:theKey];
+        if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
+            {
+            theImage = [self imageWithSize:(CGSize){ 128, 128 } scale:[UIScreen mainScreen].scale];
+            [self.document.cache setObject:theImage forKey:theKey];
+            }
+        });
     return(theImage);
+    }
+
+- (BOOL)thumbnailExists
+    {
+    NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
+    return([self.document.cache containsObjectForKey:theKey]);
     }
 
 - (UIImage *)preview
     {
-    NSString *theKey = [NSString stringWithFormat:@"page_%d_image_preview2", self.pageNumber];
-    UIImage *theImage = [self.document.cache objectForKey:theKey];
-    if (theImage == NULL)
-        {
-        CGSize theSize = self.mediaBox.size;
-        theSize.width *= 0.5;
-        theSize.height *= 0.5;
-
-        theImage = [self imageWithSize:theSize scale:[UIScreen mainScreen].scale];
-        [self.document.cache setObject:theImage forKey:theKey];
-        }
+    __block UIImage *theImage = NULL;
+    dispatch_sync(_renderPreviewQueue, ^{
+        NSString *theKey = [NSString stringWithFormat:@"page_%d_image_preview2", self.pageNumber];
+        theImage = [self.document.cache objectForKey:theKey];
+        if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
+            {
+            CGSize theSize = self.mediaBox.size;
+            theSize.width *= 0.5;
+            theSize.height *= 0.5;
+            theImage = [self imageWithSize:theSize scale:[UIScreen mainScreen].scale];
+            [self.document.cache setObject:theImage forKey:theKey];
+            }
+        });
     return(theImage);
     }
 

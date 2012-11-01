@@ -45,6 +45,7 @@
 @property (readonly, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, strong) UIView *backgroundView;
 @property (readwrite, nonatomic, assign) BOOL magazineMode;
+@property (readwrite, nonatomic, assign) CGFloat maximumContentZoom;
 @property (readonly, nonatomic, strong) NSArray *pages;
 @property (readwrite, nonatomic, strong) UIImage *pagePlaceholderImage;
 

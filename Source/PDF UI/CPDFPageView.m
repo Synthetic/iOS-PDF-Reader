@@ -51,31 +51,36 @@
 
 @synthesize delegate = _delegate;
 @synthesize page = _page;
-@synthesize renderedPageCache = _renderedPageCache;
 
 +(Class)layerClass
     {
     return([CATiledLayer class]);
     }
 
+- (void)_initialize
+    {
+    self.contentMode = UIViewContentModeRedraw;
+    
+    self.backgroundColor = [UIColor blackColor];
+    self.opaque = YES;
+    
+    CATiledLayer *tiledLayer = (CATiledLayer *)self.layer;
+    tiledLayer.levelsOfDetail = 0; // Don't make any tiles for zooming out
+    tiledLayer.tileSize = CGSizeMake(1024.0f, 1024.0f);
+    
+    UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    theTapGestureRecognizer.delegate = self;
+    [self addGestureRecognizer:theTapGestureRecognizer];
+    
+    self.opaque = YES;
+    self.userInteractionEnabled = YES;
+    }
+
 - (id)initWithCoder:(NSCoder *)inCoder
     {
     if ((self = [super initWithCoder:inCoder]) != NULL)
         {
-        self.contentMode = UIViewContentModeRedraw;
-
-        self.backgroundColor = [UIColor blackColor];
-        self.opaque = YES;
-
-        CATiledLayer *tempTiledLayer = (CATiledLayer *)self.layer;
-        tempTiledLayer.levelsOfDetail = 5;
-        tempTiledLayer.levelsOfDetailBias = 2;
-
-        UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-        theTapGestureRecognizer.delegate = self;
-        [self addGestureRecognizer:theTapGestureRecognizer];
-
-        self.userInteractionEnabled = YES;
+		[self _initialize];
         }
     return(self);
     }
@@ -84,20 +89,7 @@
     {
     if ((self = [super initWithFrame:inFrame]) != NULL)
         {
-        self.contentMode = UIViewContentModeRedraw;
-
-        self.backgroundColor = [UIColor blackColor];
-        self.opaque = YES;
-
-        CATiledLayer *tempTiledLayer = (CATiledLayer *)self.layer;
-        tempTiledLayer.levelsOfDetail = 5;
-        tempTiledLayer.levelsOfDetailBias = 2;
-
-        UITapGestureRecognizer *theTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-        theTapGestureRecognizer.delegate = self;
-        [self addGestureRecognizer:theTapGestureRecognizer];
-
-        self.userInteractionEnabled = YES;
+		[self _initialize];
         }
     return(self);
     }
@@ -116,14 +108,19 @@
 
 - (void)drawRect:(CGRect)rect
     {
-    }
+    CGContextRef context = UIGraphicsGetCurrentContext();
 
--(void)drawLayer:(CALayer*)layer inContext:(CGContextRef)context
-    {
+    if ([[NSThread currentThread] isMainThread] && CGRectEqualToRect(rect, self.bounds))
+        {
+        // Don't tile on the main thread with full bounds, instead draw the (cached) preview
+        [self.page.preview drawInRect:rect];
+        return;
+        }
+
     CGContextSaveGState(context);
 
     CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
-    CGContextFillRect(context, self.bounds);
+    CGContextFillRect(context, rect);
 
     CGAffineTransform theTransform = [self PDFTransform];
     CGContextConcatCTM(context, theTransform);
@@ -154,6 +151,12 @@
 
     CGContextRestoreGState(context);
     }
+
+- (void)didMoveToWindow
+	{
+    self.contentScaleFactor = 1.0; // Don't render unnecessary tile sizes http://markpospesel.wordpress.com/2012/04/03/on-the-importance-of-setting-contentscalefactor-in-catiledlayer-backed-views/
+	}
+
 
 #pragma mark -
 

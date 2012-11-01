@@ -44,11 +44,11 @@
 @interface CPDFDocumentViewController () <CPDFDocumentDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIGestureRecognizerDelegate, CPreviewBarDelegate, CPDFPageViewDelegate, UIScrollViewDelegate>
 
 @property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
-@property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *scrollView;
+@property (readwrite, nonatomic, strong) IBOutlet UIScrollView *scrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
+@property (readwrite, nonatomic, assign) CGRect defaultPageViewControllerFrame;
 @property (readwrite, nonatomic, assign) BOOL chromeHidden;
-@property (readwrite, nonatomic, strong) NSCache *renderedPageCache;
 
 - (void)hideChrome;
 - (void)toggleChrome;
@@ -64,7 +64,6 @@
 @synthesize previewScrollView = _previewScrollView;
 @synthesize previewBar = _previewBar;
 @synthesize chromeHidden = _chromeHidden;
-@synthesize renderedPageCache = _renderedPageCache;
 
 @synthesize document = _document;
 @synthesize backgroundView = _backgroundView;
@@ -77,8 +76,7 @@
         {
         _document = inDocument;
         _document.delegate = self;
-        _renderedPageCache = [[NSCache alloc] init];
-        _renderedPageCache.countLimit = 8;
+        _maximumContentZoom = 1.0f;
         }
     return(self);
     }
@@ -139,6 +137,7 @@
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
         theRange = (NSRange){ .location = 0, .length = 2 };
+        self.pageViewController.doubleSided = YES;
         }
     NSArray *theViewControllers = [self pageViewControllersForRange:theRange];
     [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:NULL];
@@ -147,13 +146,15 @@
 
     self.scrollView = [[CContentScrollView alloc] initWithFrame:self.pageViewController.view.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.scrollView.contentView = self.pageViewController.view;
-    self.scrollView.maximumZoomScale = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone ? 8.0 : 4.0;
+    self.scrollView.maximumZoomScale = self.maximumContentZoom;
+    self.scrollView.showsHorizontalScrollIndicator = NO;
+    self.scrollView.showsVerticalScrollIndicator = NO;
     self.scrollView.delegate = self;
     
-    [self.scrollView addSubview:self.scrollView.contentView];
+    [self.scrollView addSubview:self.pageViewController.view];
 
     [self.view insertSubview:self.scrollView atIndex:0];
+    [self.pageViewController didMoveToParentViewController:self];
 
     // #########################################################################
 
@@ -198,6 +199,13 @@
     [self.view addGestureRecognizer:theDoubleTapGestureRecognizer];
 
     [theSingleTapGestureRecognizer requireGestureRecognizerToFail:theDoubleTapGestureRecognizer];
+    for (UITapGestureRecognizer *tapRecognizer in self.pageViewController.gestureRecognizers)
+        {
+        if ([tapRecognizer isKindOfClass:[UITapGestureRecognizer class]])
+            {
+            [tapRecognizer requireGestureRecognizerToFail:theDoubleTapGestureRecognizer];
+            }
+        }
     }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -228,13 +236,20 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
     {
+    // This is not pretty, but it does the trick for now
+    [self.scrollView setZoomScale:1.0f];
     [self resizePageViewControllerForOrientation:toInterfaceOrientation];
+    [self.scrollView setZoomScale:1.0f];
+    
+    for (UIGestureRecognizer *recognizer in self.pageViewController.gestureRecognizers)
+        {
+        recognizer.enabled = YES;
+        }
     }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
     {
     [self updateTitle];
-    [self.renderedPageCache removeAllObjects];
     [self populateCache];
     }
 
@@ -308,7 +323,8 @@
 
     theFrame = CGRectIntegral(theFrame);
 
-    self.pageViewController.view.frame = theFrame;
+    self.defaultPageViewControllerFrame = theFrame;
+    self.pageViewController.view.frame = self.defaultPageViewControllerFrame;
     
     // Show fancy shadow if PageViewController view is smaller than parent view
     if (CGRectContainsRect(self.view.frame, self.pageViewController.view.frame) && CGRectEqualToRect(self.view.frame, self.pageViewController.view.frame) == NO)
@@ -333,7 +349,7 @@
     NSMutableArray *thePages = [NSMutableArray array];
     for (NSUInteger N = inRange.location; N != inRange.location + inRange.length; ++N)
         {
-        CPDFPage *thePage = N > 0 ? [self.document pageForPageNumber:N] : NULL;
+        CPDFPage *thePage = [self.document pageForPageNumber:N];
         [thePages addObject:[self pageViewControllerWithPage:thePage]];
         }
     return(thePages);
@@ -357,9 +373,8 @@
     thePageViewController.pagePlaceholderImage = self.pagePlaceholderImage;
     // Force load the view.
     [thePageViewController view];
-//    NSParameterAssert(thePageViewController.pageView != NULL);
+    [(CATiledLayer *)thePageViewController.pageView.layer setLevelsOfDetailBias:[self levelsOfDetailBias]];
     thePageViewController.pageView.delegate = self;
-    thePageViewController.pageView.renderedPageCache = self.renderedPageCache;
     return(thePageViewController);
     }
 
@@ -367,6 +382,22 @@
     {
     return([self.pageViewController.viewControllers valueForKey:@"page"]);
     }
+
+- (void)setMaximumContentZoom:(CGFloat)maximumContentZoom
+    {
+    _maximumContentZoom = maximumContentZoom;
+    
+    self.scrollView.maximumZoomScale = _maximumContentZoom;
+    
+    for (CPDFPageViewController *viewController in self.pageViewController.viewControllers)
+        {
+        [(CATiledLayer *)viewController.pageView.layer setLevelsOfDetailBias:[self levelsOfDetailBias]];
+        }
+    }
+
+- (size_t)levelsOfDetailBias {
+    return log2(self.maximumContentZoom) + 1.0f;;
+}
 
 #pragma mark -
 
@@ -387,6 +418,7 @@
 
     UIPageViewControllerNavigationDirection theDirection = inPage.pageNumber > theCurrentPageViewController.pageNumber ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
 
+    [self.scrollView setZoomScale:1.0f animated:YES];
     [self.pageViewController setViewControllers:theViewControllers direction:theDirection animated:YES completion:NULL];
     [self updateTitle];
     
@@ -397,11 +429,19 @@
 
 - (void)tap:(UITapGestureRecognizer *)inRecognizer
     {
+    if (inRecognizer.state != UIGestureRecognizerStateEnded)
+        {
+        return;
+        }
     [self toggleChrome];
     }
 
 - (void)doubleTap:(UITapGestureRecognizer *)inRecognizer
     {
+    if (inRecognizer.state != UIGestureRecognizerStateEnded)
+        {
+        return;
+        }
 //    NSLog(@"DOUBLE TAP: %f", self.scrollView.zoomScale);
     if (self.scrollView.zoomScale != 1.0)
         {
@@ -431,6 +471,11 @@
     {
 //    NSLog(@"POPULATING CACHE")
 
+    if (self.pages.count == 0)
+        {
+        return;
+        }
+    
     CPDFPage *theStartPage = [self.pages objectAtIndex:0] != [NSNull null] ? [self.pages objectAtIndex:0] : NULL;
     CPDFPage *theLastPage = [self.pages lastObject] != [NSNull null] ? [self.pages lastObject] : NULL;
 
@@ -448,27 +493,19 @@
 
 //    NSLog(@"(Potentially) Fetching: %d - %d", theStartPageNumber, theLastPageNumber);
 
-    UIView *thePageView = [[self.pageViewController.viewControllers lastObject] pageView];
+    UIView *thePageView = [[self.pageViewController.viewControllers objectAtIndex:0] pageView];
     if (thePageView == NULL)
         {
         NSLog(@"WARNING: No page view.");
         return;
         }
-    CGRect theBounds = thePageView.bounds;
-
     for (NSInteger thePageNumber = theStartPageNumber; thePageNumber <= theLastPageNumber; ++thePageNumber)
         {
-        NSString *theKey = [NSString stringWithFormat:@"%d[%d,%d]", thePageNumber, (int)theBounds.size.width, (int)theBounds.size.height];
-        if ([self.renderedPageCache objectForKey:theKey] == NULL)
-            {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                UIImage *theImage = [[self.document pageForPageNumber:thePageNumber] imageWithSize:theBounds.size scale:[UIScreen mainScreen].scale];
-                if (theImage != NULL)
-                    {
-                    [self.renderedPageCache setObject:theImage forKey:theKey];
-                    }
-                });
-            }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            CPDFPage *thePDFPage = [self.document pageForPageNumber:thePageNumber];
+            [thePDFPage preview]; // Pre-load and cache the preview image
+            [self pageViewControllerWithPage:thePDFPage]; // Force load and cache the view controller
+            });
         }
     }
 
@@ -539,37 +576,63 @@
 - (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation
     {
     UIPageViewControllerSpineLocation theSpineLocation;
-    NSArray *theViewControllers = NULL;
+    NSArray *theViewControllers = nil;
+    
+    CPDFPageViewController *currentPageViewController = NULL;
+    if (self.pageViewController.viewControllers.count > 0)
+        {
+        currentPageViewController = [self.pageViewController.viewControllers objectAtIndex:0];
+        if (currentPageViewController.pageNumber == 0 && self.pageViewController.viewControllers.count == 2)
+            {
+            // Don't transition into the placeholder page if viewing spread
+            currentPageViewController = [self.pageViewController.viewControllers objectAtIndex:1];
+            }
+        }
+    else
+        {
+        // No current view controllers, initialize with first page
+        currentPageViewController = [self pageViewControllerWithPage:[self.document pageForPageNumber:1]];
+        }
 
-	if (UIInterfaceOrientationIsPortrait(orientation) || self.document.numberOfPages == 1)
+    if (UIInterfaceOrientationIsPortrait(orientation) || self.document.numberOfPages == 1)
         {
 		theSpineLocation = UIPageViewControllerSpineLocationMin;
         self.pageViewController.doubleSided = NO;
-
-        CPDFPageViewController *theCurrentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-        if (theCurrentViewController.page == NULL)
+        if (self.pageViewController.viewControllers.count != 1)
             {
-            theViewControllers = [self pageViewControllersForRange:(NSRange){ 1, 1 }];
-            }
-        else
-            {
-            theViewControllers = [self pageViewControllersForRange:(NSRange){ theCurrentViewController.page.pageNumber, 1 }];
+            theViewControllers = @[currentPageViewController];
             }
         }
     else
         {
         theSpineLocation = UIPageViewControllerSpineLocationMid;
         self.pageViewController.doubleSided = YES;
-
-        CPDFPageViewController *theCurrentViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-        NSUInteger theCurrentPageNumber = theCurrentViewController.page.pageNumber;
-
-        theCurrentPageNumber = theCurrentPageNumber / 2 * 2;
-
-        theViewControllers = [self pageViewControllersForRange:(NSRange){ theCurrentPageNumber, 2 }];
+        
+        if (self.pageViewController.viewControllers.count != 2)
+            {
+            NSUInteger theCurrentPageNumber = currentPageViewController.page.pageNumber;
+            
+            if (theCurrentPageNumber % 2 != 0)
+                {
+                // Page is odd, alloc the view controller before it (to maintain spreads)
+                CPDFPageViewController *thePriorViewController = [self pageViewControllerWithPage:[self.document pageForPageNumber:theCurrentPageNumber - 1]];
+                theViewControllers = @[thePriorViewController, currentPageViewController];
+                }
+            else
+                {
+                // Page is even, alloc the view controller after it
+                CPDFPageViewController *theNextViewController = [self pageViewControllerWithPage:[self.document pageForPageNumber:theCurrentPageNumber + 1]];
+                theViewControllers = @[currentPageViewController, theNextViewController];
+                }
+            }
         }
-
-    [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:NULL];
+    
+    if (theViewControllers)
+        {
+        // Only change the view controllers if necessary (better performance)
+        [self.pageViewController setViewControllers:theViewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+        }
+    
     return(theSpineLocation);
     }
 
@@ -582,7 +645,12 @@
 
 - (UIImage *)previewBar:(CPreviewBar *)inPreviewBar previewAtIndex:(NSInteger)inIndex;
     {
-    UIImage *theImage = [self.document pageForPageNumber:inIndex + 1].thumbnail;
+    CPDFPage *thePage = [self.document pageForPageNumber:inIndex + 1];
+    UIImage *theImage = nil;
+    if (thePage.thumbnailExists)
+        {
+        theImage = thePage.thumbnail;
+        }
     return(theImage);
     }
 
@@ -608,5 +676,68 @@
     return(self.pageViewController.view);
     }
 
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView
+    {
+    CGFloat originX = (scrollView.contentSize.width * 0.5f);
+    CGFloat originY = (scrollView.contentSize.height * 0.5f);
+    if (scrollView.contentSize.width < scrollView.frame.size.width)
+        {
+        originX += ((scrollView.frame.size.width - scrollView.contentSize.width) / 2.0f);
+        }
+    if (scrollView.contentSize.height < scrollView.frame.size.height)
+        {
+        originY += ((scrollView.frame.size.height - scrollView.contentSize.height) / 2.0f);
+        }
+    self.pageViewController.view.center = CGPointMake(originX, originY);
+}
+
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+    {
+    scrollView.scrollEnabled = YES;
+    scrollView.pinchGestureRecognizer.enabled = YES;
+    
+    BOOL zoomAtNormal = (scrollView.zoomScale == 1.0f);
+    if (zoomAtNormal)
+        {
+        [self resizePageViewControllerForOrientation:self.interfaceOrientation];
+        }
+    else
+        {
+        self.pageViewController.view.frame = CGRectIntegral(self.pageViewController.view.frame);
+        }
+    
+    for (UIGestureRecognizer *recognizer in self.pageViewController.gestureRecognizers)
+        {
+        recognizer.enabled = zoomAtNormal;
+        }
+    }
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+    {
+    if (scrollView.zoomScale > 1.0f && scrollView.dragging)
+        {
+        CGFloat threshold = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? -90.0f : -50.0f);
+        BOOL shouldZoomOut = NO;
+        if (scrollView.contentOffset.x < threshold || scrollView.contentOffset.y < threshold)
+            {
+            // Snap zoom out if user drags beyond the top / left
+            shouldZoomOut = YES;
+            }
+        else
+            {
+            // Snap zoom out if user drags beyond the bottom / right
+            CGFloat xExtremityDrag = scrollView.contentSize.width - scrollView.frame.size.width - scrollView.contentOffset.x;
+            CGFloat yExtremityDrag = scrollView.contentSize.height - scrollView.frame.size.height - scrollView.contentOffset.y;
+            shouldZoomOut = (xExtremityDrag < threshold || yExtremityDrag < threshold);
+            }
+        
+        if (shouldZoomOut)
+            {
+            [scrollView setZoomScale:1.0f animated:YES];
+            scrollView.scrollEnabled = NO; // Prevents an unfortunate UI 'snapping' animation that would occur after the drag ends
+            scrollView.pinchGestureRecognizer.enabled = NO;
+            }
+        }
+    }
 
 @end
