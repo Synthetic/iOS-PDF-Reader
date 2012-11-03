@@ -314,6 +314,11 @@
 
 - (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation
     {
+    if (self.document.cg == NULL)
+        {
+        return;
+        }
+
     CGRect theBounds = self.view.bounds;
     CGRect theFrame;
     CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
