@@ -57,7 +57,9 @@
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
 @end
 
-@implementation CPDFDocumentViewController
+@implementation CPDFDocumentViewController {
+    NSArray *_iosSixBugFixCurrentPagesCache;
+}
 
 @synthesize pageViewController = _pageViewController;
 @synthesize scrollView = _scrollView;
@@ -233,6 +235,10 @@
     {
     return(YES);
     }
+
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    _iosSixBugFixCurrentPagesCache = [self.pages copy];
+}
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
     {
@@ -412,6 +418,11 @@
     NSRange theRange = { .location = inPage.pageNumber, .length = 1 };
     if (self.pageViewController.spineLocation == UIPageViewControllerSpineLocationMid)
         {
+        if (theRange.location % 2 != 0)
+            {
+            // Maintain spreads as designed - first page should always be even
+            theRange.location--;
+            }
         theRange.length = 2;
         }
     NSArray *theViewControllers = [self pageViewControllersForRange:theRange];
@@ -582,7 +593,18 @@
     if (self.pageViewController.viewControllers.count > 0)
         {
         currentPageViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-        if (currentPageViewController.pageNumber == 0 && self.pageViewController.viewControllers.count == 2)
+        if (_iosSixBugFixCurrentPagesCache && [self.pages isEqualToArray:_iosSixBugFixCurrentPagesCache] == NO)
+            {
+            /*
+             LEGACY iOS 6 bug fix (in spineLocationForInterfaceOrientation, on iOS 6, pVG.viewControllers always returns
+             what it was initialized with rather than the true current view controllers (most often this means it returns
+             pages 0 and 1, or page 1). We cache what the true value is in the iOSSixBugFix ivar so we can catch this and
+             rotate to the proper pages.
+             */
+            NSLog(@"Performing iOS 6 bug fix to rotate to the proper spread...");
+            currentPageViewController = [self pageViewControllerWithPage:[_iosSixBugFixCurrentPagesCache objectAtIndex:0]];
+            }
+        else if (currentPageViewController.pageNumber == 0 && self.pageViewController.viewControllers.count == 2)
             {
             // Don't transition into the placeholder page if viewing spread
             currentPageViewController = [self.pageViewController.viewControllers objectAtIndex:1];
