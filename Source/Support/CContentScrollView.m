@@ -35,6 +35,7 @@ static void *kKVOContext = NULL;
 
 @interface CContentScrollView ()
 - (void)updateContentSizeForFrame:(CGRect)inFrame;
+@property (nonatomic, assign) BOOL isObservingContentViewFrame;
 @end
 
 #pragma mark -
@@ -44,9 +45,10 @@ static void *kKVOContext = NULL;
 @synthesize contentView = contentView; // Note - UIScrollView has an ivar called "_contentView".
 
 - (void)dealloc
-    {
-    [self removeObserver:self forKeyPath:@"contentView.frame" context:&kKVOContext];
-    }
+{
+    if (self.isObservingContentViewFrame)
+        [self removeObserver:self forKeyPath:@"contentView.frame" context:&kKVOContext];
+}
 
 - (void)setFrame:(CGRect)frame
     {
@@ -61,14 +63,18 @@ static void *kKVOContext = NULL;
     }
 
 - (void)setContentView:(UIView *)inContentView
-    {
+{
     if (contentView != inContentView)
-        {
+    {
+        if (self.isObservingContentViewFrame)
+            [self removeObserver:self forKeyPath:@"contentView.frame" context:&kKVOContext];
+            
         contentView = inContentView;
         
         [self addObserver:self forKeyPath:@"contentView.frame" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:&kKVOContext];
-        }
+        self.isObservingContentViewFrame = YES;
     }
+}
 
 #pragma mark -
 
