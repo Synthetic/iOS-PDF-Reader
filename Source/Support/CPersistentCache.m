@@ -98,6 +98,10 @@
     
 - (id)objectForKey:(id)key
     {
+        // Guard against invalid input.
+        if (!key)
+            return nil;
+        
     id theObject = NULL;
     theObject = [self.cache objectForKey:key];
     if (theObject == NULL)
