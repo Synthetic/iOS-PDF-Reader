@@ -50,13 +50,21 @@ else
 	if (inScaling == ImageScaling_Proportionally)
 		{
 		float theScaleFactor = 1.0f;
-		if (inDestinationRect.size.width / inImageRect.size.width < inDestinationRect.size.height / inImageRect.size.height)
+        if (inDestinationRect.size.width / inImageRect.size.width < inDestinationRect.size.height / inImageRect.size.height)
 			{
-			theScaleFactor = inDestinationRect.size.width / inImageRect.size.width;
+                // Guard against NaN issues
+                if (inImageRect.size.width == 0)
+                    theScaleFactor = 1;
+                else
+					theScaleFactor = inDestinationRect.size.width / inImageRect.size.width;
 			}
 		else
 			{
-			theScaleFactor = inDestinationRect.size.height / inImageRect.size.height;
+                // Guard against NaN issues
+                if (inImageRect.size.height == 0)
+                    theScaleFactor = 1;
+                else
+                    theScaleFactor = inDestinationRect.size.height / inImageRect.size.height;
 			}
 		theScaledImageSize.width *= theScaleFactor;
 		theScaledImageSize.height *= theScaleFactor;
