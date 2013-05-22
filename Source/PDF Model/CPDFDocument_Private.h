@@ -35,6 +35,6 @@
 
 @interface CPDFDocument (CPDFDocument_Private)
 
-@property (readonly, nonatomic, retain) CPersistentCache *cache;
+@property (readonly, nonatomic, strong) CPersistentCache *cache;
 
 @end
