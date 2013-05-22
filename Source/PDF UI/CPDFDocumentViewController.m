@@ -108,10 +108,8 @@
     }
 
 #pragma mark -
-
-- (void)loadView
-    {
-    [super loadView];
+- (void)viewDidLoad {
+    [super viewDidLoad];
 
     [self updateTitle];
 
