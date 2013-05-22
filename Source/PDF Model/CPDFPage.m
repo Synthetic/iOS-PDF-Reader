@@ -45,180 +45,171 @@
 #pragma mark -
 
 @implementation CPDFPage
-
-@synthesize document = _document;
-@synthesize pageNumber = _pageNumber;
-@synthesize cg = _cg;
-@synthesize annotations = _annotations;
 @synthesize mediaBox = _mediaBox;
+@synthesize annotations = _annotations;
 
-- (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber;
-	{
-	if ((self = [super init]) != NULL)
-		{
+- (id)initWithDocument:(CPDFDocument *)inDocument pageNumber:(NSInteger)inPageNumber {
+    self = [super init];
+    if (self) {
         _document = inDocument;
         _pageNumber = inPageNumber;
         _mediaBox = CGRectNull;
-        _renderPreviewQueue = dispatch_queue_create("com.toxicsoftware.pdf-preview-queue", NULL);
-        _renderThumbnailQueue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
-		}
-	return(self);
-	}
-
-- (void)dealloc
-    {
-    if (_cg != NULL)
-        {
-        CGPDFPageRelease(_cg);
-        _cg = NULL;
-        dispatch_release(_renderPreviewQueue);
-        dispatch_release(_renderThumbnailQueue);
-        }
+        self.renderPreviewQueue = dispatch_queue_create("com.toxicsoftware.pdf-preview-queue", NULL);
+        self.renderThumbnailQueue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
+        self.cg = CGPDFDocumentGetPage(self.document.cg, self.pageNumber);
     }
+	return(self);
+}
+
+- (void)dealloc {
+    if (self.cg) {
+        CGPDFPageRelease(_cg);
+    }
+    dispatch_release(self.renderPreviewQueue);
+    dispatch_release(self.renderThumbnailQueue);
+}
 
 - (NSString *)description
-    {
+{
     return([NSString stringWithFormat:@"%@ (#%d, %@)", [super description], self.pageNumber, NSStringFromCGRect(self.mediaBox)]);
-    }
+}
 
-- (CGPDFPageRef)cg
-    {
-    if (_cg == NULL)
-        {
-        _cg = CGPDFPageRetain(CGPDFDocumentGetPage(self.document.cg, self.pageNumber));
-        }
-    return(_cg);
-    }
+- (void)setCg:(CGPDFPageRef)cg {
+    CGPDFPageRelease(_cg);
+    _cg = cg;
+    CGPDFPageRetain(cg);
+}
 
 - (CGRect)mediaBox
-    {
+{
     return(CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox));
-    }
+}
 
 - (UIImage *)image
-    {
+{
     UIImage *theImage = [self.document.cache objectForKey:@"image"];
     if (theImage == NULL)
-        {
+    {
         UIGraphicsBeginImageContext(self.mediaBox.size);
-
+        
         CGContextRef theContext = UIGraphicsGetCurrentContext();
-
+        
         CGContextSaveGState(theContext);
-
+        
         // Flip the context so that the PDF page is rendered right side up.
         CGContextScaleCTM(theContext, 1.0, -1.0);
         CGContextDrawPDFPage(theContext, self.cg);
-
+        CGContextRestoreGState(theContext);
+        
         theImage = UIGraphicsGetImageFromCurrentImageContext();
-
+        
         UIGraphicsEndImageContext();
-
+        
         [self.document.cache setObject:theImage forKey:@"image" cost:(NSUInteger)ceil(theImage.size.width * theImage.size.height)];
-        }
-
-    return(theImage);
     }
+    
+    return(theImage);
+}
 
 - (UIImage *)imageWithSize:(CGSize)inSize scale:(CGFloat)inScale
-    {
+{
     NSParameterAssert(inSize.width > 0 && inSize.height > 0);
-
+    
     UIGraphicsBeginImageContextWithOptions(inSize, NO, inScale);
-
+    
     CGContextRef theContext = UIGraphicsGetCurrentContext();
-
+    
 	CGContextSaveGState(theContext);
-
+    
     const CGRect theMediaBox = self.mediaBox;
     const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, (CGRect){ .size = inSize }, ImageScaling_Proportionally, ImageAlignment_Center);
-
+    
     // Fill just the render rect with white.
     CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
     CGContextFillRect(theContext, theRenderRect);
-
+    
     // Flip the context so that the PDF page is rendered right side up.
 	CGContextTranslateCTM(theContext, 0.0, inSize.height);
 	CGContextScaleCTM(theContext, 1.0, -1.0);
-
+    
 	// Scale the context so that the PDF page is rendered at the correct size for the zoom level.
     CGContextTranslateCTM(theContext, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
 	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);
-
+    
 	CGContextDrawPDFPage(theContext, self.cg);
-
+    CGContextRestoreGState(theContext);
+    
     UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
-
+    
     UIGraphicsEndImageContext();
-
+    
     return(theImage);
-    }
+}
 
 - (UIImage *)thumbnail
-    {
+{
     __block UIImage *theImage = NULL;
-    dispatch_sync(_renderThumbnailQueue, ^{
+    dispatch_sync(self.renderThumbnailQueue, ^{
         NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
         theImage = [self.document.cache objectForKey:theKey];
         if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
-            {
+        {
             theImage = [self imageWithSize:(CGSize){ 128, 128 } scale:[UIScreen mainScreen].scale];
             [self.document.cache setObject:theImage forKey:theKey];
-            }
-        });
+        }
+    });
     return(theImage);
-    }
+}
 
 - (BOOL)thumbnailExists
-    {
+{
     NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
     return([self.document.cache containsObjectForKey:theKey]);
-    }
+}
 
 - (UIImage *)preview
-    {
+{
     __block UIImage *theImage = NULL;
-    dispatch_sync(_renderPreviewQueue, ^{
+    dispatch_sync(self.renderPreviewQueue, ^{
         NSString *theKey = [NSString stringWithFormat:@"page_%d_image_preview2", self.pageNumber];
         theImage = [self.document.cache objectForKey:theKey];
         if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
-            {
+        {
             CGSize theSize = self.mediaBox.size;
             theSize.width *= 0.5;
             theSize.height *= 0.5;
             theImage = [self imageWithSize:theSize scale:[UIScreen mainScreen].scale];
             [self.document.cache setObject:theImage forKey:theKey];
-            }
-        });
+        }
+    });
     return(theImage);
-    }
+}
 
-- (NSArray *)annotations
-    {
+- (NSArray *)annotations {
     if (_annotations == NULL)
-        {
+    {
         NSMutableArray *theAnnotations = [NSMutableArray array];
-
+        
         CGPDFDictionaryRef theDictionary = CGPDFPageGetDictionary(self.cg);
-
+        
         CGPDFArrayRef thePDFAnnotationsArray = NULL;
         CGPDFDictionaryGetArray(theDictionary, "Annots", &thePDFAnnotationsArray);
         size_t theCount = CGPDFArrayGetCount(thePDFAnnotationsArray);
         for (size_t N = 0; N != theCount; ++N)
-            {
+        {
             CGPDFDictionaryRef theObject;
             CGPDFArrayGetDictionary(thePDFAnnotationsArray, N, &theObject);
             CPDFAnnotation *theAnnotation = [[CPDFAnnotation alloc] initWithDictionary:theObject];
             [theAnnotations addObject:theAnnotation];
-            }
-
-    //    CGPDFDictionaryApplyBlock(theDictionary, ^(const char *key, CGPDFObjectRef value) {
-    //        NSLog(@"%s", key);
-    //        });
-
-        _annotations = [theAnnotations copy];
         }
-    return(_annotations);
+        
+        //    CGPDFDictionaryApplyBlock(theDictionary, ^(const char *key, CGPDFObjectRef value) {
+        //        NSLog(@"%s", key);
+        //        });
+        
+        _annotations = [theAnnotations copy];
     }
+    return(_annotations);
+}
 
 @end
