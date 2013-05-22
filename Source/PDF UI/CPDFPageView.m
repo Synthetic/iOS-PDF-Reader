@@ -52,13 +52,11 @@
 @synthesize delegate = _delegate;
 @synthesize page = _page;
 
-+(Class)layerClass
-    {
-    return([CATiledLayer class]);
-    }
++ (Class)layerClass {
+    return [CATiledLayer class];
+}
 
-- (void)_initialize
-    {
+- (void)_initialize {
     self.contentMode = UIViewContentModeRedraw;
     
     self.backgroundColor = [UIColor blackColor];
@@ -74,83 +72,49 @@
     
     self.opaque = YES;
     self.userInteractionEnabled = YES;
-    }
+}
 
-- (id)initWithCoder:(NSCoder *)inCoder
-    {
-    if ((self = [super initWithCoder:inCoder]) != NULL)
-        {
+- (id)initWithCoder:(NSCoder *)inCoder {
+    self = [super initWithCoder:inCoder];
+    if (self) {
 		[self _initialize];
-        }
-    return(self);
     }
+    return self;
+}
 
-- (id)initWithFrame:(CGRect)inFrame
-    {
-    if ((self = [super initWithFrame:inFrame]) != NULL)
-        {
-		[self _initialize];
-        }
-    return(self);
+- (id)initWithFrame:(CGRect)inFrame {
+    self = [super initWithFrame:inFrame];
+    if (self) {
+        [self _initialize];
     }
+    return self;
+}
 
-- (void)setPage:(CPDFPage *)inPage
-    {
-    if (_page != inPage)
-        {
+- (void)setPage:(CPDFPage *)inPage {
+    if (_page != inPage) {
         _page = inPage;
-
         [self addAnnotationViews];
-
         [self setNeedsDisplay];
-        }
     }
+}
 
-- (void)drawRect:(CGRect)rect
-    {
-    CGContextRef context = UIGraphicsGetCurrentContext();
-
-    if ([[NSThread currentThread] isMainThread] && CGRectEqualToRect(rect, self.bounds))
-        {
-        // Don't tile on the main thread with full bounds, instead draw the (cached) preview
-        [self.page.preview drawInRect:rect];
-        return;
-        }
-
+- (void)drawLayer:(CALayer*)layer inContext:(CGContextRef)context {
+    // Fill the background with white.
+    CGContextSetRGBFillColor(context, 1.0,1.0,1.0,1.0);
+    CGContextFillRect(context, self.bounds);
+    
     CGContextSaveGState(context);
-
-    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
-    CGContextFillRect(context, rect);
-
-    CGAffineTransform theTransform = [self PDFTransform];
-    CGContextConcatCTM(context, theTransform);
-
+    // Flip the context so that the PDF page is rendered right side up.
+    CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    
+    // Scale the context so that the PDF page is rendered at the correct size for the zoom level.
+    CGRect pageRect = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
+    CGFloat pdfScale = self.frame.size.width/pageRect.size.width;
+    CGContextScaleCTM(context, pdfScale, pdfScale);
     CGContextDrawPDFPage(context, self.page.cg);
-
-#if 0
-	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
-    CGContextSetLineWidth(context, 0.5);
-    CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFCropBox));
-
-	CGContextSetRGBStrokeColor(context, 0.0,1.0,0.0,1.0);
-    CGContextSetLineWidth(context, 0.5);
-    CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFBleedBox));
-
-	CGContextSetRGBStrokeColor(context, 0.0,0.0,0.0,1.0);
-    CGContextSetLineWidth(context, 0.5);
-    CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
-#endif
-
-#if 0
-	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
-    for (CPDFAnnotation *theAnnotation in self.page.annotations)
-        {
-        CGContextStrokeRect(context, theAnnotation.frame);
-        }
-#endif
-
     CGContextRestoreGState(context);
-    }
+}
 
 - (void)didMoveToWindow
 	{
