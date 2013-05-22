@@ -52,14 +52,13 @@
 @synthesize page = _page;
 @synthesize pagePlaceholderImage = _pagePlaceholderImage;
 
-- (id)initWithPage:(CPDFPage *)inPage;
-    {
-    if ((self = [super initWithNibName:NULL bundle:NULL]) != NULL)
-        {
+- (id)initWithPage:(CPDFPage *)inPage {
+    self = [super initWithNibName:nil bundle:nil];
+    if (self) {
         _page = inPage;
-        }
-    return self;
     }
+    return self;
+}
 
 - (void)viewDidLoad
     {
