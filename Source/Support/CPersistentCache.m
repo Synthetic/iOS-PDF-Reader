@@ -82,20 +82,18 @@
     return(_URL);
     }
     
-- (BOOL)containsObjectForKey:(id)key
-    {
+- (BOOL)containsObjectForKey:(id)key {
     id theObject = [self.cache objectForKey:key];
-    if (theObject == NULL)
-        {
+    if (!theObject) {
         NSURL *theMetadataURL = [[self.URL URLByAppendingPathComponent:key] URLByAppendingPathExtension:@"metadata.plist"];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:theMetadataURL.path] == YES)
-            {
-            return(YES);
-            }
-        }
-    return(NO);
+        if ([[NSFileManager defaultManager] fileExistsAtPath:theMetadataURL.path])
+            return YES;
+    } else {
+        return YES;
     }
-    
+    return NO;
+}
+
 - (id)objectForKey:(id)key
     {
         // Guard against invalid input.
