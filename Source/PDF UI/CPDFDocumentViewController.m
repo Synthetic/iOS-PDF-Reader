@@ -45,10 +45,8 @@
 
 @property (readwrite, nonatomic, strong) UIPageViewController *pageViewController;
 @property (readwrite, nonatomic, strong) IBOutlet UIScrollView *scrollView;
-@property (readwrite, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) CGRect defaultPageViewControllerFrame;
-@property (readwrite, nonatomic, assign) BOOL chromeHidden;
 
 - (void)hideChrome;
 - (void)toggleChrome;

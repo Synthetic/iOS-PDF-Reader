@@ -41,7 +41,7 @@
 @property (readwrite, nonatomic, strong) CPDFDocument *document;
 
 @property (readonly, nonatomic, strong) UIPageViewController *pageViewController;
-@property (readonly, nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
+@property (nonatomic, strong) IBOutlet CContentScrollView *previewScrollView;
 @property (readonly, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, strong) UIView *backgroundView;
 @property (readwrite, nonatomic, assign) BOOL magazineMode;
@@ -51,6 +51,7 @@
 @property (nonatomic, strong) NSString *documentTitle;
 @property (nonatomic, assign) NSInteger largestPageNumberViewed;
 @property (nonatomic, strong) NSDate *timeMagazineOpened;
+@property (nonatomic, assign) BOOL chromeHidden;
 
 - (id)initWithURL:(NSURL *)inURL;
 
