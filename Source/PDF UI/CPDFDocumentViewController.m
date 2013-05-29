@@ -293,6 +293,7 @@
         else
             {
             self.title = [NSString stringWithFormat:@"Page %d", theFirstViewController.page.pageNumber];
+                self.largestPageNumberViewed = MAX(self.largestPageNumberViewed, theFirstViewController.page.pageNumber);
             }
         }
     else if (theViewControllers.count == 2)
@@ -306,6 +307,7 @@
             {
             CPDFPageViewController *theSecondViewController = [theViewControllers objectAtIndex:1];
             self.title = [NSString stringWithFormat:@"Pages %d-%d", theFirstViewController.page.pageNumber, theSecondViewController.page.pageNumber];
+                self.largestPageNumberViewed = MAX(self.largestPageNumberViewed, theSecondViewController.page.pageNumber);
             }
         }
     }
@@ -377,15 +379,16 @@
     }
 
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage
-    {
+{
     CPDFPageViewController *thePageViewController = [[CPDFPageViewController alloc] initWithPage:inPage];
+    thePageViewController.documentTitle = self.documentTitle;
     thePageViewController.pagePlaceholderImage = self.pagePlaceholderImage;
     // Force load the view.
     [thePageViewController view];
     [(CATiledLayer *)thePageViewController.pageView.layer setLevelsOfDetailBias:[self levelsOfDetailBias]];
     thePageViewController.pageView.delegate = self;
-    return(thePageViewController);
-    }
+    return thePageViewController;
+}
 
 - (NSArray *)pages
     {

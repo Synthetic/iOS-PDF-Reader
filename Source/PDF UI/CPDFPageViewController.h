@@ -40,6 +40,7 @@
 @property (readonly, nonatomic, strong) CPDFPage *page;
 @property (readonly, nonatomic, strong) CPDFPageView *pageView;
 @property (readwrite, nonatomic, strong) UIImage *pagePlaceholderImage;
+@property (nonatomic, strong) NSString *documentTitle;
 
 - (id)initWithPage:(CPDFPage *)inPage;
 

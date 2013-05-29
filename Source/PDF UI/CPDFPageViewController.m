@@ -34,12 +34,14 @@
 #import "CPDFPageView.h"
 #import "CPDFDocument.h"
 #import "CPDFPage.h"
+#import "LocalyticsSession.h"
 
 @interface CPDFPageViewController ()
 @property (readwrite, nonatomic, strong) CPDFPage *page;
 @property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *previewView;
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *placeholderView;
+@property (nonatomic, strong) NSDate *startViewDate;
 @end
 
 #pragma mark -
@@ -58,6 +60,21 @@
         _page = inPage;
     }
     return self;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.startViewDate = [NSDate date];
+    [[LocalyticsSession sharedLocalyticsSession] tagScreen:@"Page"];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    NSTimeInterval timeSpentOnPage = [self.startViewDate timeIntervalSinceNow] * -1;
+    NSDictionary *loggingAttributes = @{@"Issue Title": self.documentTitle,
+                                        @"Page": [NSNumber numberWithInteger:self.page.pageNumber],
+                                        @"Time Spent on Page": [NSNumber numberWithFloat:timeSpentOnPage]};
+    [[LocalyticsSession sharedLocalyticsSession] tagEvent:@"Page View" attributes:loggingAttributes];
 }
 
 - (void)viewDidLoad

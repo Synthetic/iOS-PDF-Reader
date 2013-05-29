@@ -48,6 +48,9 @@
 @property (readwrite, nonatomic, assign) CGFloat maximumContentZoom;
 @property (readonly, nonatomic, strong) NSArray *pages;
 @property (readwrite, nonatomic, strong) UIImage *pagePlaceholderImage;
+@property (nonatomic, strong) NSString *documentTitle;
+@property (nonatomic, assign) NSInteger largestPageNumberViewed;
+@property (nonatomic, strong) NSDate *timeMagazineOpened;
 
 - (id)initWithURL:(NSURL *)inURL;
 
