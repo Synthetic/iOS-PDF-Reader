@@ -68,13 +68,30 @@
     [[LocalyticsSession sharedLocalyticsSession] tagScreen:@"Page"];
 }
 
+- (NSString *)timeBucketForTime:(NSTimeInterval)time {
+    if (time <= 5)
+        return @"0s-5s";
+    else if (time <= 30)
+        return @"5s-30s";
+    else if (time <= 60)
+        return @"30s-1m";
+    else if (time <= 120)
+        return @"1m-2m";
+    else if (time <= 300)
+        return @"2m-5m";
+    else
+        return @"5m+";
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     NSTimeInterval timeSpentOnPage = [self.startViewDate timeIntervalSinceNow] * -1;
-    NSDictionary *loggingAttributes = @{@"Issue Title": self.documentTitle,
-                                        @"Page": [NSNumber numberWithInteger:self.page.pageNumber],
-                                        @"Time Spent on Page": [NSNumber numberWithFloat:timeSpentOnPage]};
-    [[LocalyticsSession sharedLocalyticsSession] tagEvent:@"Page View" attributes:loggingAttributes];
+    NSString *eventName = [NSString stringWithFormat:@"Page View-%@", self.documentTitle];
+    NSString *orientation = (UIInterfaceOrientationIsLandscape(self.interfaceOrientation) ? @"Landscape" : @"Portrait");
+    NSDictionary *loggingAttributes = @{@"Page": [NSNumber numberWithInteger:self.page.pageNumber],
+                                        @"Orientation": orientation,
+                                        @"Time Spent on Page": [self timeBucketForTime:timeSpentOnPage]};
+    [[LocalyticsSession sharedLocalyticsSession] tagEvent:eventName attributes:loggingAttributes];
 }
 
 - (void)viewDidLoad
