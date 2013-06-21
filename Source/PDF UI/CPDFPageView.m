@@ -98,21 +98,49 @@
     }
 }
 
-- (void)drawLayer:(CALayer*)layer inContext:(CGContextRef)context {
-    // Fill the background with white.
-    CGContextSetRGBFillColor(context, 1.0,1.0,1.0,1.0);
-    CGContextFillRect(context, self.bounds);
+- (void)drawRect:(CGRect)rect
+{
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    if ([[NSThread currentThread] isMainThread] && CGRectEqualToRect(rect, self.bounds))
+    {
+        // Don't tile on the main thread with full bounds, instead draw the (cached) preview
+        [self.page.preview drawInRect:rect];
+        return;
+    }
     
     CGContextSaveGState(context);
-    // Flip the context so that the PDF page is rendered right side up.
-    CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
-    CGContextScaleCTM(context, 1.0, -1.0);
     
-    // Scale the context so that the PDF page is rendered at the correct size for the zoom level.
-    CGRect pageRect = CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox);
-    CGFloat pdfScale = self.frame.size.width/pageRect.size.width;
-    CGContextScaleCTM(context, pdfScale, pdfScale);
+    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextFillRect(context, rect);
+    
+    CGAffineTransform theTransform = [self PDFTransform];
+    CGContextConcatCTM(context, theTransform);
+    
     CGContextDrawPDFPage(context, self.page.cg);
+    
+#if 0
+	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
+    CGContextSetLineWidth(context, 0.5);
+    CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFCropBox));
+    
+	CGContextSetRGBStrokeColor(context, 0.0,1.0,0.0,1.0);
+    CGContextSetLineWidth(context, 0.5);
+    CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFBleedBox));
+    
+	CGContextSetRGBStrokeColor(context, 0.0,0.0,0.0,1.0);
+    CGContextSetLineWidth(context, 0.5);
+    CGContextStrokeRect(context, CGPDFPageGetBoxRect(self.page.cg, kCGPDFMediaBox));
+#endif
+    
+#if 0
+	CGContextSetRGBStrokeColor(context, 1.0,0.0,0.0,1.0);
+    for (CPDFAnnotation *theAnnotation in self.page.annotations)
+    {
+        CGContextStrokeRect(context, theAnnotation.frame);
+    }
+#endif
+    
     CGContextRestoreGState(context);
 }
 
