@@ -220,13 +220,6 @@
         });
     }
 
-- (void)viewDidAppear:(BOOL)animated
-    {
-    [super viewDidAppear:animated];
-
-    [self performSelector:@selector(hideChrome) withObject:NULL afterDelay:0.5];
-    }
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
     return(YES);
