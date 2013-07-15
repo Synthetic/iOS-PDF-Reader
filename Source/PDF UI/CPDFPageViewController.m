@@ -98,7 +98,7 @@
     {
     [super viewDidLoad];
     //
-    if (self.page != NULL && CGRectIsEmpty(self.page.mediaBox) == NO)
+    if ((self.page != NULL) && !CGRectIsNull(self.page.mediaBox) && CGRectIsEmpty(self.page.mediaBox) == NO)
         {
         self.previewView = [[UIImageView alloc] initWithFrame:self.view.bounds];
         self.previewView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
