@@ -43,11 +43,6 @@
 
 @implementation CPDFAnnotation
 
-@synthesize subtype = _subtype;
-@synthesize info = _info;
-@synthesize frame = _frame;
-@synthesize dictionary = _dictionary;
-
 - (id)initWithDictionary:(CGPDFDictionaryRef)inDictionary
     {
     if ((self = [super init]) != NULL)
@@ -76,7 +71,9 @@
             };
 
         CGPDFDictionaryGetObject(inDictionary, "A", &theObject);
-        _info = TXConvertPDFObject(theObject);
+        id convertedObject = TXConvertPDFObject(theObject);
+            if ([convertedObject isKindOfClass:[NSDictionary class]])
+                _info = convertedObject;
         }
     return self;
     }
