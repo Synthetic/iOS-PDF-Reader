@@ -117,7 +117,9 @@
                 NSString *theType = [theMetadata objectForKey:@"type"];            
                 [self data:theData type:theType toObject:&theObject error:NULL];
                 
-                [self.cache setObject:theObject forKey:key cost:theCost];
+                    // In case the previous method doesn't fill "theObject", prevent it from being set on our cache.
+                    if (theObject != nil)
+                        [self.cache setObject:theObject forKey:key cost:theCost];
                 }
             }
         }
