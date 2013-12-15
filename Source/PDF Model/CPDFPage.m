@@ -38,13 +38,14 @@
 #import "CPDFAnnotation.h"
 
 @interface CPDFPage ()
-@property (readwrite, nonatomic, assign) dispatch_queue_t renderPreviewQueue;
-@property (readwrite, nonatomic, assign) dispatch_queue_t renderThumbnailQueue;
 @end
 
 #pragma mark -
 
-@implementation CPDFPage
+@implementation CPDFPage {
+    dispatch_queue_t _renderPreviewQueue;
+    dispatch_queue_t _renderThumbnailQueue;
+}
 @synthesize mediaBox = _mediaBox;
 @synthesize annotations = _annotations;
 
@@ -54,8 +55,8 @@
         _document = inDocument;
         _pageNumber = inPageNumber;
         _mediaBox = CGRectNull;
-        self.renderPreviewQueue = dispatch_queue_create("com.toxicsoftware.pdf-preview-queue", NULL);
-        self.renderThumbnailQueue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
+        _renderPreviewQueue = dispatch_queue_create("com.toxicsoftware.pdf-preview-queue", NULL);
+        _renderThumbnailQueue = dispatch_queue_create("com.toxicsoftware.pdf-thumbnail-queue", NULL);
         self.cg = CGPDFDocumentGetPage(self.document.cg, self.pageNumber);
     }
 	return(self);
@@ -65,8 +66,6 @@
     if (self.cg) {
         CGPDFPageRelease(_cg);
     }
-    dispatch_release(self.renderPreviewQueue);
-    dispatch_release(self.renderThumbnailQueue);
 }
 
 - (NSString *)description
@@ -149,7 +148,7 @@
 - (UIImage *)thumbnail
 {
     __block UIImage *theImage = NULL;
-    dispatch_sync(self.renderThumbnailQueue, ^{
+    dispatch_sync(_renderThumbnailQueue, ^{
         NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
         theImage = [self.document.cache objectForKey:theKey];
         if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
@@ -170,7 +169,7 @@
 - (UIImage *)preview
 {
     __block UIImage *theImage = NULL;
-    dispatch_sync(self.renderPreviewQueue, ^{
+    dispatch_sync(_renderPreviewQueue, ^{
         NSString *theKey = [NSString stringWithFormat:@"page_%d_image_preview2", self.pageNumber];
         theImage = [self.document.cache objectForKey:theKey];
         if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)

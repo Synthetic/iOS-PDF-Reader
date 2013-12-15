@@ -142,6 +142,9 @@
 
     [self addChildViewController:self.pageViewController];
 
+    if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) { // LEGACY iOS 6
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
     self.scrollView = [[CContentScrollView alloc] initWithFrame:self.pageViewController.view.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.maximumZoomScale = self.maximumContentZoom;
@@ -211,14 +214,25 @@
     [super viewWillAppear:animated];
     //
     [self resizePageViewControllerForOrientation:self.interfaceOrientation];
+    }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     double delayInSeconds = 1.0;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [self populateCache];
         [self.document startGeneratingThumbnails];
-        });
-    }
+    });
+}
+
+- (void)viewDidDisappear:(BOOL)animate {
+    [super viewDidDisappear:animate];
+    
+    [self.pageViewController.view removeFromSuperview];
+    [self.pageViewController removeFromParentViewController];
+}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
