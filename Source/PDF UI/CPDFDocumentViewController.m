@@ -298,7 +298,6 @@
         else
             {
             self.title = [NSString stringWithFormat:@"Page %d", theFirstViewController.page.pageNumber];
-                self.largestPageNumberViewed = MAX(self.largestPageNumberViewed, theFirstViewController.page.pageNumber);
             }
         }
     else if (theViewControllers.count == 2)
@@ -312,7 +311,6 @@
             {
             CPDFPageViewController *theSecondViewController = [theViewControllers objectAtIndex:1];
             self.title = [NSString stringWithFormat:@"Pages %d-%d", theFirstViewController.page.pageNumber, theSecondViewController.page.pageNumber];
-                self.largestPageNumberViewed = MAX(self.largestPageNumberViewed, theSecondViewController.page.pageNumber);
             }
         }
     }

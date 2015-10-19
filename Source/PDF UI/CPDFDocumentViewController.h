@@ -49,8 +49,6 @@
 @property (readonly, nonatomic, strong) NSArray *pages;
 @property (readwrite, nonatomic, strong) UIImage *pagePlaceholderImage;
 @property (nonatomic, strong) NSString *documentTitle;
-@property (nonatomic, assign) NSInteger largestPageNumberViewed;
-@property (nonatomic, strong) NSDate *timeMagazineOpened;
 @property (nonatomic, assign) BOOL chromeHidden;
 
 - (id)initWithURL:(NSURL *)inURL;

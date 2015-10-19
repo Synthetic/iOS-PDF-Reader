@@ -34,14 +34,12 @@
 #import "CPDFPageView.h"
 #import "CPDFDocument.h"
 #import "CPDFPage.h"
-#import "LocalyticsSession.h"
 
 @interface CPDFPageViewController ()
 @property (readwrite, nonatomic, strong) CPDFPage *page;
 @property (readwrite, nonatomic, strong) IBOutlet CPDFPageView *pageView;
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *previewView;
 @property (readwrite, nonatomic, strong) IBOutlet UIImageView *placeholderView;
-@property (nonatomic, strong) NSDate *startViewDate;
 @end
 
 #pragma mark -
@@ -60,38 +58,6 @@
         _page = inPage;
     }
     return self;
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    self.startViewDate = [NSDate date];
-    [[LocalyticsSession sharedLocalyticsSession] tagScreen:@"Page"];
-}
-
-- (NSString *)timeBucketForTime:(NSTimeInterval)time {
-    if (time <= 5)
-        return @"0s-5s";
-    else if (time <= 30)
-        return @"5s-30s";
-    else if (time <= 60)
-        return @"30s-1m";
-    else if (time <= 120)
-        return @"1m-2m";
-    else if (time <= 300)
-        return @"2m-5m";
-    else
-        return @"5m+";
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    NSTimeInterval timeSpentOnPage = [self.startViewDate timeIntervalSinceNow] * -1;
-    NSString *eventName = [NSString stringWithFormat:@"Page View-%@", self.documentTitle];
-    NSString *orientation = (UIInterfaceOrientationIsLandscape(self.interfaceOrientation) ? @"Landscape" : @"Portrait");
-    NSDictionary *loggingAttributes = @{@"Page": [NSNumber numberWithInteger:self.page.pageNumber],
-                                        @"Orientation": orientation,
-                                        @"Time Spent on Page": [self timeBucketForTime:timeSpentOnPage]};
-    [[LocalyticsSession sharedLocalyticsSession] tagEvent:eventName attributes:loggingAttributes];
 }
 
 - (void)viewDidLoad
