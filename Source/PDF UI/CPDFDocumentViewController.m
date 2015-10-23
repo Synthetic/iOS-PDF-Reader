@@ -524,7 +524,12 @@
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             CPDFPage *thePDFPage = [self.document pageForPageNumber:thePageNumber];
             [thePDFPage preview]; // Pre-load and cache the preview image
-            [self pageViewControllerWithPage:thePDFPage]; // Force load and cache the view controller
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // UIKit API calls must be on main queue
+                [self pageViewControllerWithPage:thePDFPage]; // Force load and cache the view controller
+                });
+            
             });
         }
     }
