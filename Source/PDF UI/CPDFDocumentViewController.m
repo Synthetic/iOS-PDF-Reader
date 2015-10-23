@@ -48,8 +48,6 @@
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) CGRect defaultPageViewControllerFrame;
 
-- (void)hideChrome;
-- (void)toggleChrome;
 - (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation;
 - (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation;
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
@@ -262,28 +260,23 @@
     [self populateCache];
     }
 
-- (void)hideChrome
-    {
-        if (self.chromeHidden == NO)
-            {
-            [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
-                self.navigationController.navigationBar.alpha = 0.0;
-                self.previewScrollView.alpha = 0.0;
-                } completion:^(BOOL finished) {
-                self.chromeHidden = YES;
-                }];
-            }
-    }
+- (void)setChromeHidden:(BOOL)chromeHidden {
+    [self setChromeHidden:chromeHidden animated:NO afterDelay:0.0];
+}
 
-- (void)toggleChrome
-    {
-    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration animations:^{
-        self.navigationController.navigationBar.alpha = (1.0 - !self.chromeHidden);
-        self.previewScrollView.alpha = (1.0 - !self.chromeHidden);
-        } completion:^(BOOL finished) {
-        self.chromeHidden = !self.chromeHidden;
-        }];
-    }
+- (void)setChromeHidden:(BOOL)chromeHidden animated:(BOOL)animate {
+    [self setChromeHidden:chromeHidden animated:animate afterDelay:0.0];
+}
+
+- (void)setChromeHidden:(BOOL)chromeHidden animated:(BOOL)animate afterDelay:(CGFloat)delay {
+    _chromeHidden = chromeHidden;
+    
+    CGFloat alpha = (chromeHidden ? 0.0 : 1.0);
+    [UIView animateWithDuration:UINavigationControllerHideShowBarDuration delay:delay options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.navigationController.navigationBar.alpha = alpha;
+        self.previewScrollView.alpha = alpha;
+    } completion:nil];
+}
 
 - (void)updateTitle
     {
@@ -453,7 +446,7 @@
         {
         return;
         }
-    [self toggleChrome];
+    [self setChromeHidden:!self.chromeHidden animated:YES];
     }
 
 - (void)doubleTap:(UITapGestureRecognizer *)inRecognizer
@@ -579,7 +572,7 @@
     {
     [self updateTitle];
     [self populateCache];
-    [self hideChrome];
+    [self setChromeHidden:YES animated:YES];
 
     CPDFPageViewController *theFirstViewController = [self.pageViewController.viewControllers objectAtIndex:0];
     if (theFirstViewController.page)

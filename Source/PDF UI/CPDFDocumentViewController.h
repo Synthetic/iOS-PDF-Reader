@@ -51,6 +51,9 @@
 @property (nonatomic, strong) NSString *documentTitle;
 @property (nonatomic, assign) BOOL chromeHidden;
 
+- (void)setChromeHidden:(BOOL)chromeHidden animated:(BOOL)animate;
+- (void)setChromeHidden:(BOOL)chromeHidden animated:(BOOL)animate afterDelay:(CGFloat)delay;
+
 - (id)initWithURL:(NSURL *)inURL;
 
 - (BOOL)openPage:(CPDFPage *)inPage;
