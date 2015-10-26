@@ -110,7 +110,7 @@
 
 - (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber
     {
-    NSString *theKey = [NSString stringWithFormat:@"page_%d", inPageNumber];
+    NSString *theKey = [NSString stringWithFormat:@"page_%ld", (long)inPageNumber];
     CPDFPage *thePage = [self.cache objectForKey:theKey];
     if (thePage == NULL)
         {
@@ -169,7 +169,7 @@
 
             CPDFPage *thePage = [thePagesByPageInfo objectForKey:[NSNumber numberWithInt:(int)thePageDictionary]];
 
-            [thePageNumbersForPageNames setObject:[NSNumber numberWithInt:thePage.pageNumber] forKey:thePageName];
+            [thePageNumbersForPageNames setObject:[NSNumber numberWithInteger:thePage.pageNumber] forKey:thePageName];
             }
 
         _pageNumbersByName = [thePageNumbersForPageNames copy];

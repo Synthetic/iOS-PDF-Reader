@@ -290,7 +290,7 @@
             }
         else
             {
-            self.title = [NSString stringWithFormat:@"Page %d", theFirstViewController.page.pageNumber];
+            self.title = [NSString stringWithFormat:@"Page %ld", (long)theFirstViewController.page.pageNumber];
             }
         }
     else if (theViewControllers.count == 2)
@@ -303,7 +303,7 @@
         else
             {
             CPDFPageViewController *theSecondViewController = [theViewControllers objectAtIndex:1];
-            self.title = [NSString stringWithFormat:@"Pages %d-%d", theFirstViewController.page.pageNumber, theSecondViewController.page.pageNumber];
+            self.title = [NSString stringWithFormat:@"Pages %ld-%ld", (long)theFirstViewController.page.pageNumber, (long)theSecondViewController.page.pageNumber];
             }
         }
     }
@@ -581,7 +581,7 @@
         NSMutableIndexSet *theIndexSet = [NSMutableIndexSet indexSet];
         for (NSNumber *thePageNumber in thePageNumbers)
             {
-            int N = [thePageNumber integerValue] - 1;
+            int N = [thePageNumber intValue] - 1;
             if (N != 0)
                 {
                 [theIndexSet addIndex:N];
@@ -720,7 +720,7 @@
     self.pageViewController.view.center = CGPointMake(originX, originY);
 }
 
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
     {
     scrollView.scrollEnabled = YES;
     scrollView.pinchGestureRecognizer.enabled = YES;

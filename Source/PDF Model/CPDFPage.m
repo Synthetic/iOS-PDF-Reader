@@ -70,7 +70,7 @@
 
 - (NSString *)description
 {
-    return([NSString stringWithFormat:@"%@ (#%d, %@)", [super description], self.pageNumber, NSStringFromCGRect(self.mediaBox)]);
+    return([NSString stringWithFormat:@"%@ (#%ld, %@)", [super description], (long)self.pageNumber, NSStringFromCGRect(self.mediaBox)]);
 }
 
 - (void)setCg:(CGPDFPageRef)cg {
@@ -149,7 +149,7 @@
 {
     __block UIImage *theImage = NULL;
     dispatch_sync(_renderThumbnailQueue, ^{
-        NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
+        NSString *theKey = [NSString stringWithFormat:@"page_%ld_image_128x128", (long)self.pageNumber];
         theImage = [self.document.cache objectForKey:theKey];
         if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
         {
@@ -162,7 +162,7 @@
 
 - (BOOL)thumbnailExists
 {
-    NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
+    NSString *theKey = [NSString stringWithFormat:@"page_%ld_image_128x128", (long)self.pageNumber];
     return([self.document.cache containsObjectForKey:theKey]);
 }
 
@@ -170,7 +170,7 @@
 {
     __block UIImage *theImage = NULL;
     dispatch_sync(_renderPreviewQueue, ^{
-        NSString *theKey = [NSString stringWithFormat:@"page_%d_image_preview2", self.pageNumber];
+        NSString *theKey = [NSString stringWithFormat:@"page_%ld_image_preview2", (long)self.pageNumber];
         theImage = [self.document.cache objectForKey:theKey];
         if (theImage == NULL && CGRectIsEmpty(self.mediaBox) == NO)
         {
