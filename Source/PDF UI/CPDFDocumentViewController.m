@@ -225,13 +225,6 @@
     });
 }
 
-- (void)viewDidDisappear:(BOOL)animate {
-    [super viewDidDisappear:animate];
-    
-    [self.pageViewController.view removeFromSuperview];
-    [self.pageViewController removeFromParentViewController];
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
     {
     return(YES);
