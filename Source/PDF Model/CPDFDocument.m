@@ -51,11 +51,16 @@
 
 @synthesize pageNumbersByName = _pageNumbersByName;
 
-- (id)initWithURL:(NSURL *)inURL;
+- (id)initWithURL:(NSURL *)inURL {
+    return [self initWithURL:inURL uniqueIdentifier:nil];
+}
+
+- (id)initWithURL:(NSURL *)inURL uniqueIdentifier:(NSString *)identifier;
 	{
 	if ((self = [super init]) != NULL)
 		{
         _URL = inURL;
+        _uniqueIdentifier = identifier;
 
         _cg = CGPDFDocumentCreateWithURL((__bridge CFURLRef)inURL);
 		}

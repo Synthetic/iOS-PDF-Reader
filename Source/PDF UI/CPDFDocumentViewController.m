@@ -79,9 +79,13 @@
     return(self);
     }
 
-- (id)initWithURL:(NSURL *)inURL;
+- (id)initWithURL:(NSURL *)inURL {
+    return [self initWithURL:inURL uniqueIdentifier:nil];
+}
+
+- (id)initWithURL:(NSURL *)inURL uniqueIdentifier:(NSString *)identifier;
     {
-    CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:inURL];
+    CPDFDocument *theDocument = [[CPDFDocument alloc] initWithURL:inURL uniqueIdentifier:identifier];
     return([self initWithDocument:theDocument]);
     }
 

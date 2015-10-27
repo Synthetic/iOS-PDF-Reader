@@ -43,8 +43,10 @@
 @property (readwrite, nonatomic, weak) id <CPDFDocumentDelegate> delegate;
 
 @property (readonly, nonatomic, strong) NSString *title;
+@property (readonly, nonatomic, strong) NSString *uniqueIdentifier;
 
 - (id)initWithURL:(NSURL *)inURL;
+- (id)initWithURL:(NSURL *)inURL uniqueIdentifier:(NSString *)identifier;
 
 - (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber;
 - (CPDFPage *)pageForPageName:(NSString *)inPageName;

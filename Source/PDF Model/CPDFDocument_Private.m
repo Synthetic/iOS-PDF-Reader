@@ -43,7 +43,10 @@
     CPersistentCache *theCache = objc_getAssociatedObject(self, theCacheKey);
     if (theCache == NULL)
         {
-        NSString *theCacheName = [[self.URL lastPathComponent] stringByDeletingPathExtension];
+		NSString *theCacheName = self.uniqueIdentifier;
+		if ([theCacheName length] == 0) {
+			theCacheName = [[self.URL lastPathComponent] stringByDeletingPathExtension];
+		}
         theCache = [[CPersistentCache alloc] initWithName:theCacheName];
         objc_setAssociatedObject(self, theCacheKey, theCache, OBJC_ASSOCIATION_RETAIN);
         }

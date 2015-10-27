@@ -55,6 +55,7 @@
 - (void)setChromeHidden:(BOOL)chromeHidden animated:(BOOL)animate afterDelay:(CGFloat)delay;
 
 - (id)initWithURL:(NSURL *)inURL;
+- (id)initWithURL:(NSURL *)inURL uniqueIdentifier:(NSString *)identifier;
 
 - (BOOL)openPage:(CPDFPage *)inPage;
 
