@@ -48,14 +48,10 @@
 @property (readwrite, nonatomic, strong) IBOutlet CPreviewBar *previewBar;
 @property (readwrite, nonatomic, assign) CGRect defaultPageViewControllerFrame;
 
-- (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation;
-- (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation;
 - (CPDFPageViewController *)pageViewControllerWithPage:(CPDFPage *)inPage;
 @end
 
-@implementation CPDFDocumentViewController {
-    NSArray *_iosSixBugFixCurrentPagesCache;
-}
+@implementation CPDFDocumentViewController
 
 @synthesize pageViewController = _pageViewController;
 @synthesize scrollView = _scrollView;
@@ -115,7 +111,7 @@
 
     // #########################################################################
     UIPageViewControllerSpineLocation theSpineLocation;
-    if ([self canDoubleSpreadForOrientation:self.interfaceOrientation] == YES)
+    if ([self canDoubleSpreadForSize:self.view.bounds.size] == YES)
         {
         theSpineLocation = UIPageViewControllerSpineLocationMid;
         }
@@ -144,9 +140,8 @@
 
     [self addChildViewController:self.pageViewController];
 
-    if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) { // LEGACY iOS 6
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    
     self.scrollView = [[CContentScrollView alloc] initWithFrame:self.pageViewController.view.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.maximumZoomScale = self.maximumContentZoom;
@@ -154,6 +149,7 @@
     self.scrollView.showsVerticalScrollIndicator = NO;
     self.scrollView.delegate = self;
     
+    self.pageViewController.view.autoresizingMask = UIViewAutoresizingNone;
     [self.scrollView addSubview:self.pageViewController.view];
 
     [self.view insertSubview:self.scrollView atIndex:0];
@@ -215,7 +211,7 @@
     {
     [super viewWillAppear:animated];
     //
-    [self resizePageViewControllerForOrientation:self.interfaceOrientation];
+    [self resizePageViewControllerForSize:self.view.bounds.size];
     }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -229,33 +225,28 @@
     });
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-    {
-    return(YES);
-    }
-
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    _iosSixBugFixCurrentPagesCache = [self.pages copy];
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-    {
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
     // This is not pretty, but it does the trick for now
     [self.scrollView setZoomScale:1.0f];
-    [self resizePageViewControllerForOrientation:toInterfaceOrientation];
-    [self.scrollView setZoomScale:1.0f];
+    [self resizePageViewControllerForSize:size];
     
-    for (UIGestureRecognizer *recognizer in self.pageViewController.gestureRecognizers)
-        {
-        recognizer.enabled = YES;
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        //
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        [self.scrollView setZoomScale:1.0f];
+        for (UIGestureRecognizer *recognizer in self.pageViewController.gestureRecognizers) {
+            recognizer.enabled = YES;
         }
-    }
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-    {
-    [self updateTitle];
-    [self populateCache];
-    }
+        [self updateTitle];
+        [self populateCache];
+    }];
+}
 
 - (void)setChromeHidden:(BOOL)chromeHidden {
     [self setChromeHidden:chromeHidden animated:NO afterDelay:0.0];
@@ -305,17 +296,17 @@
         }
     }
 
-- (void)resizePageViewControllerForOrientation:(UIInterfaceOrientation)inOrientation
+- (void)resizePageViewControllerForSize:(CGSize)viewSize
     {
     if (self.document.cg == NULL)
         {
         return;
         }
 
-    CGRect theBounds = self.view.bounds;
+    CGRect theBounds = CGRectMake(0.0, 0.0, viewSize.width, viewSize.height);
     CGRect theFrame;
     CGRect theMediaBox = [self.document pageForPageNumber:1].mediaBox;
-    if ([self canDoubleSpreadForOrientation:inOrientation] == YES)
+    if ([self canDoubleSpreadForSize:viewSize] == YES)
         {
         theMediaBox.size.width *= 2;
         theFrame = ScaleAndAlignRectToRect(theMediaBox, theBounds, ImageScaling_Proportionally, ImageAlignment_Center);
@@ -331,7 +322,7 @@
     self.pageViewController.view.frame = self.defaultPageViewControllerFrame;
     
     // Show fancy shadow if PageViewController view is smaller than parent view
-    if (CGRectContainsRect(self.view.frame, self.pageViewController.view.frame) && CGRectEqualToRect(self.view.frame, self.pageViewController.view.frame) == NO)
+    if (CGRectContainsRect(theBounds, self.pageViewController.view.frame) && CGRectEqualToRect(theBounds, self.pageViewController.view.frame) == NO)
         {
             CALayer *theLayer = self.pageViewController.view.layer;
             theLayer.shadowPath = [[UIBezierPath bezierPathWithRect:self.pageViewController.view.bounds] CGPath];
@@ -359,9 +350,9 @@
     return(thePages);
     }
 
-- (BOOL)canDoubleSpreadForOrientation:(UIInterfaceOrientation)inOrientation
+- (BOOL)canDoubleSpreadForSize:(CGSize)viewSize
     {
-    if (UIInterfaceOrientationIsPortrait(inOrientation) || self.document.numberOfPages == 1)
+    if ((viewSize.height > viewSize.width) || self.document.numberOfPages == 1)
         {
         return(NO);
         }
@@ -466,12 +457,12 @@
 - (IBAction)gotoPage:(id)sender
     {
     NSUInteger thePageNumber = [self.previewBar.selectedPreviewIndexes firstIndex] + 1;
-    if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation))
+    if ([self viewBoundsAreLandscape])
         {
         thePageNumber = thePageNumber / 2 * 2;
         }
 
-    NSUInteger theLength = UIInterfaceOrientationIsPortrait(self.interfaceOrientation) ? 1 : ( thePageNumber < self.document.numberOfPages ? 2 : 1 );
+    NSUInteger theLength = ([self viewBoundsAreLandscape]) ? (thePageNumber < self.document.numberOfPages ? 2 : 1 ) : 1;
     self.previewBar.selectedPreviewIndexes = [NSIndexSet indexSetWithIndexesInRange:(NSRange){ .location = thePageNumber - 1, .length = theLength }];
 
     [self openPage:[self.document pageForPageNumber:thePageNumber]];
@@ -493,7 +484,7 @@
     NSInteger theLastPageNumber = [theLastPage pageNumber];
         
     NSInteger pageSpanToLoad = 1;
-    if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation))
+    if ([self viewBoundsAreLandscape])
         {
         pageSpanToLoad = 2;
         }
@@ -524,6 +515,10 @@
         }
     }
 
+- (BOOL)viewBoundsAreLandscape {
+    return (self.view.bounds.size.width > self.view.bounds.size.height);
+}
+
 #pragma mark -
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
@@ -536,7 +531,7 @@
         return(NULL);
         }
 
-    if (theNextPageNumber == 0 && UIInterfaceOrientationIsPortrait(self.interfaceOrientation))
+    if (theNextPageNumber == 0 && [self viewBoundsAreLandscape] == NO)
         {
         return(NULL);
         }
@@ -597,18 +592,7 @@
     if (self.pageViewController.viewControllers.count > 0)
         {
         currentPageViewController = [self.pageViewController.viewControllers objectAtIndex:0];
-        if (_iosSixBugFixCurrentPagesCache && [self.pages isEqualToArray:_iosSixBugFixCurrentPagesCache] == NO)
-            {
-            /*
-             LEGACY iOS 6 bug fix (in spineLocationForInterfaceOrientation, on iOS 6, pVG.viewControllers always returns
-             what it was initialized with rather than the true current view controllers (most often this means it returns
-             pages 0 and 1, or page 1). We cache what the true value is in the iOSSixBugFix ivar so we can catch this and
-             rotate to the proper pages.
-             */
-            NSLog(@"Performing iOS 6 bug fix to rotate to the proper spread...");
-            currentPageViewController = [self pageViewControllerWithPage:[_iosSixBugFixCurrentPagesCache objectAtIndex:0]];
-            }
-        else if (currentPageViewController.pageNumber == 0 && self.pageViewController.viewControllers.count == 2)
+        if (currentPageViewController.pageNumber == 0 && self.pageViewController.viewControllers.count == 2)
             {
             // Don't transition into the placeholder page if viewing spread
             currentPageViewController = [self.pageViewController.viewControllers objectAtIndex:1];
@@ -725,7 +709,7 @@
     BOOL zoomAtNormal = (scrollView.zoomScale == 1.0f);
     if (zoomAtNormal)
         {
-        [self resizePageViewControllerForOrientation:self.interfaceOrientation];
+        [self resizePageViewControllerForSize:self.view.bounds.size];
         }
     else
         {
