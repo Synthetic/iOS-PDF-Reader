@@ -35,6 +35,8 @@
 #import "PDFUtilities.h"
 #import "CPDFStream.h"
 
+#import <UIKit/UIKit.h>
+
 @interface CPDFAnnotation ()
 @property (readwrite, nonatomic, assign) CGPDFDictionaryRef dictionary;
 @end

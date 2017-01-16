@@ -30,6 +30,7 @@
 //  or implied, of Jonathan Wight.
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @class CPDFDocument;
 

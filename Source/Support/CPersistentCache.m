@@ -32,6 +32,7 @@
 #import "CPersistentCache.h"
 
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <UIKit/UIKit.h>
 
 #define CACHE_VERSION 0
 

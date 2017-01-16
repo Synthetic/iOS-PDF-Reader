@@ -30,6 +30,7 @@
 //  or implied, of Jonathan Wight.
 
 #import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 extern id TXConvertPDFObject(CGPDFObjectRef inObject);
 extern void TXCGPDFDictionaryApplyBlock(CGPDFDictionaryRef inDictionary, void (^inBlock)(const char *key, CGPDFObjectRef value));
