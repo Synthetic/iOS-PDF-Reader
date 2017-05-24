@@ -178,7 +178,10 @@
             theSize.width *= 0.5;
             theSize.height *= 0.5;
             theImage = [self imageWithSize:theSize scale:[UIScreen mainScreen].scale];
-            [self.document.cache setObject:theImage forKey:theKey];
+            if (theImage != nil)
+            {
+                [self.document.cache setObject:theImage forKey:theKey];
+            }
         }
     });
     return(theImage);
