@@ -157,14 +157,20 @@
 
     // #########################################################################
 
+    CGFloat bottomSafeInset = 0.0;
+    if (@available(iOS 11.0, *)) {
+        UIEdgeInsets safeInsets = [[[[[UIApplication sharedApplication] keyWindow] rootViewController] view] safeAreaInsets]; // not set on self.view yet, this is quick enough and works.
+        bottomSafeInset = safeInsets.bottom;
+    }
+
     CGRect theFrame = (CGRect){
         .origin = {
             .x = CGRectGetMinX(self.view.bounds),
-            .y = CGRectGetMaxY(self.view.bounds) - 74,
+            .y = CGRectGetMaxY(self.view.bounds) - 74 - bottomSafeInset,
             },
         .size = {
             .width = CGRectGetWidth(self.view.bounds),
-            .height = 74,
+            .height = 74 + bottomSafeInset,
             },
         };
 
